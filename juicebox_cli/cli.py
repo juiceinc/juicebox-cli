@@ -2,7 +2,7 @@
 """
 import click
 
-from auth import get_juicebox_token
+from auth import JuiceBoxAuthenticator
 
 
 @click.group()
@@ -17,7 +17,8 @@ def cli():
 def login(username):
     password = click.prompt('Password', type=str, hide_input=True)
     click.echo('{}.{}'.format(username, password))
-    get_juicebox_token(username, password)
+    jb_auth = JuiceBoxAuthenticator(username, password)
+    jb_auth.get_juicebox_token(save=True)
 
 
 @cli.command()
