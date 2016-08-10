@@ -3,6 +3,7 @@
 import click
 
 from auth import JuiceBoxAuthenticator
+from upload import S3Uploader
 
 
 @click.group()
@@ -22,5 +23,9 @@ def login(username):
 
 
 @cli.command()
-def publish_file():
-    pass
+@click.argument('files', nargs=-1)
+def upload(files):
+    if not files:
+        return
+    s3_uploader = S3Uploader(files)
+    print s3_uploader

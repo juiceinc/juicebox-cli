@@ -22,7 +22,10 @@ class JuiceBoxAuthenticator:
     def is_auth_preped(self):
         if self.token:
             return True
-        if self.netrc_proxy.authenticators(NETRC_HOST_NAME):
+        username, _, token = self.netrc_proxy.authenticators(NETRC_HOST_NAME)
+        if username and token:
+            self.username = username
+            self.token = token
             return True
         return False
 
@@ -39,6 +42,15 @@ class JuiceBoxAuthenticator:
 
         if save:
             self.update_netrc()
+
+    def is_valid_token(self):
+        url = '{}/api/v1/jb/clients/'.format(INTERNAL_API_URL)
+        headers = {'Authorization': 'Token {}'.format(self.token),
+                   'Accept': 'application/json'}
+        response = requests.get(url, headers=headers)
+        if response.status_code != 200:
+            return False
+        return True
 
     def get_netrc_token(self):
         auth = self.netrc_proxy.authenticators(NETRC_HOST_NAME)
