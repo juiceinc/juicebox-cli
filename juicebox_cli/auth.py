@@ -30,6 +30,7 @@ class JuiceBoxAuthenticator:
         return False
 
     def get_juicebox_token(self, save=False):
+        """ MOVE ME TO PUBLIC API"""
         url = '{}/api/v1/api-token-auth/'.format(INTERNAL_API_URL)
         data = {'username': self.username, 'password': self.password}
         headers = {'content-type': 'application/json'}
@@ -44,6 +45,7 @@ class JuiceBoxAuthenticator:
             self.update_netrc()
 
     def is_valid_token(self):
+        """ MOVE ME TO PUBLIC API"""
         url = '{}/api/v1/jb/clients/'.format(INTERNAL_API_URL)
         headers = {'Authorization': 'Token {}'.format(self.token),
                    'Accept': 'application/json'}
