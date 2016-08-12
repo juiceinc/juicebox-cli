@@ -49,12 +49,23 @@ class S3Uploader:
             if os.path.isdir(upload_file):
                 self.file_finder(upload_file)
                 continue
+            if upload_file.startswith('../'):
+                filename = upload_file.replace('../', '')
+            elif upload_file.startswith('./'):
+                filename = upload_file.replace('./', '')
+            elif upload_file.startswith('/'):
+                path, filename = os.path.split(upload_file)
+                parent, local = os.path.split(path)
+                filename = os.sep.join([local, filename])
+            elif upload_file.startswith('.'):
+                continue
+
             try:
                 response = client.put_object(
                     ACL='bucket-owner-full-control',
                     Body=upload_file,
                     Bucket='juicebox-uploads-test',
-                    Key='client-1/' + upload_file
+                    Key='client-1/' + filename
                 )
                 logger.debug('Uploaded %s successfully.', upload_file)
             except Exception as exc_info:
@@ -65,5 +76,7 @@ class S3Uploader:
 
     def file_finder(self, origin_directory):
         for root, _, filenames, in os.walk(origin_directory):
+            if root.startswith('..'):
+                root = root.replace('../', '')
             for filename in filenames:
                 self.files.append(os.path.join(root, filename))
