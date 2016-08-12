@@ -24,8 +24,14 @@ def login(username):
 
 @cli.command()
 @click.argument('files', nargs=-1)
-def upload(files):
+@click.pass_context
+def upload(ctx, files):
     if not files:
         return
     s3_uploader = S3Uploader(files)
-    print s3_uploader
+    failed_files = s3_uploader.upload()
+    if failed_files:
+        message = 'Failed to upload {}'.format(', '.join(failed_files))
+        click.echo(click.style(message, fg='red'))
+        ctx.abort()
+    click.echo(click.style('Successfully Uploaded!', fg='green'))
