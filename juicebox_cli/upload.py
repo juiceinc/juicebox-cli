@@ -1,6 +1,7 @@
 """Uploads files to s3
 """
 import json
+import os
 
 import boto3
 import requests
@@ -14,7 +15,7 @@ class S3Uploader:
     sts_token = None
 
     def __init__(self, files):
-        self.files = files
+        self.files = list(files)
         self.jb_auth = JuiceBoxAuthenticator()
         if not self.jb_auth.is_auth_preped():
             raise AuthenticationError('Please login first.')
@@ -45,6 +46,9 @@ class S3Uploader:
         )
         failed_files = []
         for upload_file in self.files:
+            if os.path.isdir(upload_file):
+                self.file_finder(upload_file)
+                continue
             try:
                 response = client.put_object(
                     ACL='bucket-owner-full-control',
@@ -58,3 +62,8 @@ class S3Uploader:
                 logger.error(exc_info)
 
         return failed_files
+
+    def file_finder(self, origin_directory):
+        for root, _, filenames, in os.walk(origin_directory):
+            for filename in filenames:
+                self.files.append(os.path.join(root, filename))

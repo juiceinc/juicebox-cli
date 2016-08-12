@@ -23,7 +23,8 @@ def login(username):
 
 
 @cli.command()
-@click.argument('files', nargs=-1)
+@click.argument('files', nargs=-1,
+                type=click.Path(exists=True, dir_okay=True, readable=True))
 @click.pass_context
 def upload(ctx, files):
     if not files:
