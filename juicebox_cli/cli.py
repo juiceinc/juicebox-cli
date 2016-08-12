@@ -26,8 +26,9 @@ def login(username):
 @click.argument('files', nargs=-1,
                 type=click.Path(exists=True, dir_okay=True, readable=True))
 @click.option('--job')
+@click.option('--env', default='prod')
 @click.pass_context
-def upload(ctx, job, files):
+def upload(ctx, env, job, files):
     if not files:
         return
     s3_uploader = S3Uploader(files)
