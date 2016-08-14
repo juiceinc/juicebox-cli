@@ -6,7 +6,7 @@ import os
 
 import requests
 
-from juicebox_cli.config import INTERNAL_API_URL, NETRC_HOST_NAME
+from juicebox_cli.config import PUBLIC_API_URL, NETRC_HOST_NAME
 from juicebox_cli.exceptions import AuthenticationError
 
 
@@ -31,7 +31,7 @@ class JuiceBoxAuthenticator:
 
     def get_juicebox_token(self, save=False):
         """ MOVE ME TO PUBLIC API"""
-        url = '{}/api/v1/api-token-auth/'.format(INTERNAL_API_URL)
+        url = '{}//token/'.format(PUBLIC_API_URL)
         data = {'username': self.username, 'password': self.password}
         headers = {'content-type': 'application/json'}
         response = requests.post(url, data=json.dumps(data), headers=headers)
@@ -43,16 +43,6 @@ class JuiceBoxAuthenticator:
 
         if save:
             self.update_netrc()
-
-    def is_valid_token(self):
-        """ MOVE ME TO PUBLIC API"""
-        url = '{}/api/v1/jb/clients/'.format(INTERNAL_API_URL)
-        headers = {'Authorization': 'Token {}'.format(self.token),
-                   'Accept': 'application/json'}
-        response = requests.get(url, headers=headers)
-        if response.status_code != 200:
-            return False
-        return True
 
     def get_netrc_token(self):
         auth = self.netrc_proxy.authenticators(NETRC_HOST_NAME)

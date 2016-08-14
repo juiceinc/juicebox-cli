@@ -7,21 +7,20 @@ import boto3
 import requests
 
 from juicebox_cli.auth import JuiceBoxAuthenticator
+from juicebox_cli.config import PUBLIC_API_URL
 from juicebox_cli.exceptions import AuthenticationError
 from juicebox_cli.logger import logger
 
 
 class S3Uploader:
-    sts_token = None
-
     def __init__(self, files):
         self.files = list(files)
         self.jb_auth = JuiceBoxAuthenticator()
         if not self.jb_auth.is_auth_preped():
             raise AuthenticationError('Please login first.')
 
-    def upload(self):
-        url = '{}/upload-token/'.format('http://localhost:5010')
+    def get_s3_upload_token(self):
+        url = '{}/upload-token/'.format(PUBLIC_API_URL)
         data = {
             'data': {
                 'attributes': {
@@ -38,6 +37,11 @@ class S3Uploader:
             raise AuthenticationError('I was unable to authenticate you with'
                                       'those credentials')
         credentials = response.json()['data']['attributes']
+
+        return credentials
+
+    def upload(self):
+        credentials = self.get_s3_upload_token()
         client = boto3.client(
             's3',
             aws_access_key_id=credentials['access_key_id'],
@@ -61,7 +65,7 @@ class S3Uploader:
                 continue
 
             try:
-                response = client.put_object(
+                client.put_object(
                     ACL='bucket-owner-full-control',
                     Body=upload_file,
                     Bucket='juicebox-uploads-test',
