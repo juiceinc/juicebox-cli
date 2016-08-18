@@ -2,6 +2,7 @@
 """
 import json
 import os
+import uuid
 
 import boto3
 import requests
@@ -50,6 +51,7 @@ class S3Uploader:
         )
         failed_files = []
         for upload_file in self.files:
+            filename = upload_file
             if os.path.isdir(upload_file):
                 self.file_finder(upload_file)
                 continue
@@ -65,11 +67,12 @@ class S3Uploader:
                 continue
 
             try:
+                generated_folder = uuid.uuid4()
                 client.put_object(
                     ACL='bucket-owner-full-control',
                     Body=upload_file,
                     Bucket='juicebox-uploads-test',
-                    Key='client-1/' + filename
+                    Key='client-1/{}/{}'.format(generated_folder, filename)
                 )
                 logger.debug('Uploaded %s successfully.', upload_file)
             except Exception as exc_info:
