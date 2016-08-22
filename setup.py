@@ -8,17 +8,19 @@ requirements = [
 
 # Have setuptools generate the entry point
 # wrapper scripts.
-entry_points = '''[console_scripts]
-juice=juicebox_cli.cli:cli
-'''
+entry_points = {
+    'console_scripts': [
+        'juice=juicebox_cli.cli:cli',
+    ],
+}
 
 setup(
     name='juicebox_cli',
     version='0.1.0',
     description='Juicebox CLI',
-    author="Tim O'Guin",
+    author='Juice Analytics',
     author_email='tim.oguin@juiceanalytics.com',
-    packages=find_packages(),
+    packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
     install_requires=requirements,
     entry_points=entry_points,
     classifiers=[
