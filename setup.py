@@ -30,7 +30,7 @@ setup(
           'Intended Audience :: End Users/Desktop',
           'Intended Audience :: Developers',
           'Intended Audience :: System Administrators',
-          'License :: OSI Approved :: Apache 2.0 License',
+          'License :: OSI Approved :: Apache Software License',
           'Operating System :: MacOS :: MacOS X',
           'Operating System :: Microsoft :: Windows',
           'Operating System :: POSIX',
@@ -41,5 +41,7 @@ setup(
           'Programming Language :: Python :: 3.4'
           'Programming Language :: Python :: 3.5'
           'Topic :: Office/Business',
+          'Topic :: Internet',
+          'Topic :: Communications :: File Sharing',
     ],
 )
