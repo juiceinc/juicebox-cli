@@ -15,4 +15,4 @@ deployment:
   master:
     branch: master
     commands:
-      - aws s3 sync docs/_build/html s3://juicedocs/projects/juicecli --acl private --delete
+      - aws s3 sync docs/build/html s3://juicedocs/projects/juicecli --acl private --delete
