@@ -30,7 +30,7 @@ def login(ctx, username):
     jb_auth = JuiceBoxAuthenticator(username, password)
     try:
         jb_auth.get_juicebox_token(save=True)
-    except requests.ConnectionError as exc_info:
+    except requests.ConnectionError:
         message = 'Failed to connect to public API'
         logger.debug(message)
         click.echo(click.style(message, fg='red'))
@@ -56,7 +56,7 @@ def upload(ctx, env, job, files):
     failed_files = None
     try:
         failed_files = s3_uploader.upload()
-    except requests.ConnectionError as exc_info:
+    except requests.ConnectionError:
         message = 'Failed to connect to public API'
         logger.debug(message)
         click.echo(click.style(message, fg='red'))

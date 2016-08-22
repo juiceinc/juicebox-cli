@@ -23,6 +23,7 @@ setup(
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
     install_requires=requirements,
     entry_points=entry_points,
+    url='https://github.com/juiceinc/juicebox_cli',
     classifiers=[
           'Development Status :: 4 - Beta',
           'Environment :: Console',
