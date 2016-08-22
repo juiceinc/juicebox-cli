@@ -1,5 +1,14 @@
 from setuptools import setup, find_packages
 
+from codecs import open
+from os import path
+
+here = path.abspath(path.dirname(__file__))
+
+# Get the long description from the README file
+with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
+    long_description = f.read()
+
 requirements = [
     'certifi==2016.8.8',
     'click==6.6',
@@ -18,6 +27,7 @@ setup(
     name='juicebox_cli',
     version='0.1.0',
     description='Juicebox CLI',
+    long_description=long_description,
     author='Juice Analytics',
     author_email='tim.oguin@juiceanalytics.com',
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
