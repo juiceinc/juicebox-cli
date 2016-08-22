@@ -25,7 +25,7 @@ entry_points = {
 
 setup(
     name='juicebox_cli',
-    version='0.1.0',
+    version='0.1.1',
     description='Juicebox CLI',
     long_description=long_description,
     author='Juice Analytics',
