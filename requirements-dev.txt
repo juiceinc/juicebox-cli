@@ -2,5 +2,6 @@
 check-manifest==0.32
 pytest==2.9.2
 flake8==3.0.4
+mock==2.0.0
 Sphinx==1.4.5
 twine==1.8.1
