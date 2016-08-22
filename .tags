@@ -1,7 +1,0 @@
-click	/Users/jasonmyers/dev/juicebox-cli/juicebox_cli/cli.py	/^import click$/;"	namespace	line:3
-JuiceBoxAuthenticator	/Users/jasonmyers/dev/juicebox-cli/juicebox_cli/cli.py	/^from auth import JuiceBoxAuthenticator$/;"	namespace	line:5
-S3Uploader	/Users/jasonmyers/dev/juicebox-cli/juicebox_cli/cli.py	/^from upload import S3Uploader$/;"	namespace	line:6
-cli	/Users/jasonmyers/dev/juicebox-cli/juicebox_cli/cli.py	/^def cli():$/;"	function	line:11
-login	/Users/jasonmyers/dev/juicebox-cli/juicebox_cli/cli.py	/^def login(username):$/;"	function	line:18
-type	/Users/jasonmyers/dev/juicebox-cli/juicebox_cli/cli.py	/^                type=click.Path(exists=True, dir_okay=True, readable=True))$/;"	variable	line:27
-upload	/Users/jasonmyers/dev/juicebox-cli/juicebox_cli/cli.py	/^def upload(ctx, env, job, files):$/;"	function	line:31
