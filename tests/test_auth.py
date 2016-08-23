@@ -141,7 +141,7 @@ class TestJuiceBoxAuthenticator:
 machine git.heroku.com
   login jason@jasonamyers.com
   password example_token"""
-        output_lines = [x for x in netrc_string.splitlines(keepends=True)]
+        output_lines = [x for x in netrc_string.splitlines(True)]
         output_lines[-1] = output_lines[-1] + '\n'
         output_lines.extend(['machine api.juiceboxdata.com\n',
                              '  login cookie monster\n', '  password None\n'])
@@ -170,7 +170,7 @@ machine git.heroku.com
 machine api.juiceboxdata.com
   login cookie monster
   password token"""
-        output_lines = [x for x in netrc_string.splitlines(keepends=True)]
+        output_lines = [x for x in netrc_string.splitlines(True)]
         output_lines[-1] = output_lines[-1] + '\n'
         netrc_token = ('cookie monster', 'token')
         with patch.object(JuiceBoxAuthenticator, 'get_netrc_token',
