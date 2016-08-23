@@ -61,7 +61,7 @@ class JuiceBoxAuthenticator:
         """Pulls token from netrc file """
         logger.debug('Checking for JB token in netrc')
         auth = self.netrc_proxy.authenticators(NETRC_HOST_NAME)
-        if auth is not None:
+        if auth:
             logger.debug('Found JB Token in netrc')
             login, _, token = auth
             return login, token
@@ -76,13 +76,12 @@ class JuiceBoxAuthenticator:
         if os.name == 'nt':
             logger.debug('WINDOWS!')
             netrc_os_file = os.path.expanduser('$HOME\_netrc')
-
-        auth = self.get_juicebox_token()
-        if auth is not None:
+        username, token = self.get_netrc_token()
+        if username:
             logger.debug('Updating existing token')
             jb_lines = False
             with open(netrc_os_file) as netrc_file:
-                for line in netrc_file:
+                for line in netrc_file.readlines():
                     if 'api.juiceboxdata.com' in line:
                         logger.debug('Found start of our entry')
                         jb_lines = True
@@ -96,11 +95,11 @@ class JuiceBoxAuthenticator:
             logger.debug('Adding new JB entry')
             with open(netrc_os_file) as netrc_file:
                 output_lines = netrc_file.readlines()
-
+                output_lines[-1] = output_lines[-1] + '\n'
         logger.debug('Building JB entry')
         output_lines.append('machine api.juiceboxdata.com\n')
         output_lines.append('  login {}\n'.format(self.username))
-        output_lines.append('  password {}\n'.format(self.token))
+        output_lines.append('  password {}\n'.format(self.token or token))
 
         logger.debug('Writing new netrc')
         with open(netrc_os_file, 'w') as netrc_file:
