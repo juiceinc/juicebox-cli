@@ -8,7 +8,6 @@ from juicebox_cli.upload import S3Uploader
 from tests.response import Response
 
 
-
 class TestS3Uploader:
 
     @patch('juicebox_cli.upload.JuiceBoxAuthenticator')
@@ -60,12 +59,15 @@ class TestS3Uploader:
                       data=ANY,
                       headers={'content-type': 'application/json'})]
         first_call = req_mock.mock_calls[0]
-        data_dict = {'data':
-                         {'attributes':
-                              {'token': 'cookies',
-                               'username': 'chris@juice.com'},
-                          'type': 'jbtoken'}
-                     }
+        data_dict = {
+            'data': {
+                'attributes': {
+                 'token': 'cookies',
+                 'username': 'chris@juice.com'
+                },
+                'type': 'jbtoken'
+            }
+        }
         assert data_dict == json.loads(first_call[2]['data'])
 
     @patch('juicebox_cli.upload.requests')
@@ -74,7 +76,6 @@ class TestS3Uploader:
         jba_mock.return_value.is_auth_preped.return_value = True
         jba_mock.return_value.username = 'chris@juice.com'
         jba_mock.return_value.token = 'cookies'
-        credentials = {'key': 'dis_key', 'secret': 'dat_secret'}
         req_mock.post.return_value = Response(400, {})
         files = ['cookies.txt', 'bad_cakes.zip']
         s3u = S3Uploader(files)
@@ -87,12 +88,15 @@ class TestS3Uploader:
                           data=ANY,
                           headers={'content-type': 'application/json'})]
             first_call = req_mock.mock_calls[0]
-            data_dict = {'data':
-                             {'attributes':
-                                  {'token': 'cookies',
-                                   'username': 'chris@juice.com'},
-                              'type': 'jbtoken'}
-                         }
+            data_dict = {
+                'data': {
+                    'attributes': {
+                        'token': 'cookies',
+                        'username': 'chris@juice.com'
+                    },
+                    'type': 'jbtoken'
+                }
+            }
             assert data_dict == json.loads(first_call[2]['data'])
 
     @patch('juicebox_cli.upload.boto3')
@@ -136,7 +140,8 @@ class TestS3Uploader:
         }
         files = ['cookies.txt', 'bad_cakes.zip']
         jba_mock.return_value.is_auth_preped.return_value = True
-        boto_mock.client.return_value.put_object.side_effect = [None, ValueError]
+        boto_mock.client.return_value.put_object.side_effect = [None,
+                                                                ValueError]
         with patch.object(S3Uploader, 'get_s3_upload_token') as token_mock:
             token_mock.return_value = creds_dict
             s3u = S3Uploader(files)
