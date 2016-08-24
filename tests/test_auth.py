@@ -4,15 +4,7 @@ import pytest
 from mock import call, mock_open, patch, ANY
 
 from juicebox_cli.auth import JuiceBoxAuthenticator, AuthenticationError
-
-
-class Response:
-    def __init__(self, status_code, json_return=None):
-        self.status_code = status_code
-        self._json = json_return
-
-    def json(self):
-        return self._json
+from tests.response import Response
 
 
 class TestJuiceBoxAuthenticator:

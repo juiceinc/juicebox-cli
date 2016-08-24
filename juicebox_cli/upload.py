@@ -40,7 +40,7 @@ class S3Uploader:
 
         if response.status_code != 200:
             logger.debug(response)
-            raise AuthenticationError('I was unable to authenticate you with'
+            raise AuthenticationError('Unable to authenticate you with '
                                       'those credentials')
         credentials = response.json()['data']['attributes']
         logger.debug('Successfully retrieved STS S3 Upload token')
