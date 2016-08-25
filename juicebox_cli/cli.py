@@ -49,7 +49,7 @@ def login(ctx, username):
                 type=click.Path(exists=True, dir_okay=True, readable=True))
 @click.option('--job')
 @click.option('--env', default='prod')
-@click.option('--client')
+@click.option('--client', default=None)
 @click.pass_context
 def upload(ctx, client, env, job, files):
     logger.debug('Starting upload for %s - %s: %s', env, job, files)

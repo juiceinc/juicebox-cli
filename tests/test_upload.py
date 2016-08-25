@@ -34,7 +34,6 @@ class TestS3Uploader:
                 call().is_auth_preped().__bool__(),
                 call().__bool__()
             ]
-            print(str(exc_info.__dict__))
             assert 'Please login first.' in str(exc_info)
 
     @patch('juicebox_cli.upload.requests')
@@ -49,7 +48,7 @@ class TestS3Uploader:
         files = ['cookies.txt', 'bad_cakes.zip']
         s3u = S3Uploader(files)
         results = s3u.get_s3_upload_token()
-        assert results == credentials
+        assert results == {'data': {'attributes': credentials}}
         assert jba_mock.mock_calls == [call(), call().is_auth_preped()]
         assert req_mock.mock_calls == [
             call.post('http://api.juiceboxdata.com/upload-token/',
@@ -60,7 +59,8 @@ class TestS3Uploader:
             'data': {
                 'attributes': {
                  'token': 'cookies',
-                 'username': 'chris@juice.com'
+                 'username': 'chris@juice.com',
+                 'client': None
                 },
                 'type': 'jbtoken'
             }
@@ -100,9 +100,18 @@ class TestS3Uploader:
     @patch('juicebox_cli.upload.JuiceBoxAuthenticator')
     def test_upload(self, jba_mock, boto_mock):
         creds_dict = {
-            'access_key_id': 'dis_key',
-            'secret_access_key': 'dat_secret',
-            'session_token': 'these_are_a_mile_long'
+            'data': {
+                'attributes': {
+                    'access_key_id': 'dis_key',
+                    'secret_access_key': 'dat_secret',
+                    'session_token': 'these_are_a_mile_long'
+                },
+                'relationships': {
+                    'clients': {
+                        'data': [{'id': 0}]
+                    }
+                }
+            }
         }
         files = ['cookies.txt', 'bad_cakes.zip']
         jba_mock.return_value.is_auth_preped.return_value = True
@@ -131,9 +140,18 @@ class TestS3Uploader:
     @patch('juicebox_cli.upload.JuiceBoxAuthenticator')
     def test_upload_bad(self, jba_mock, boto_mock):
         creds_dict = {
-            'access_key_id': 'dis_key',
-            'secret_access_key': 'dat_secret',
-            'session_token': 'these_are_a_mile_long'
+            'data': {
+                'attributes': {
+                    'access_key_id': 'dis_key',
+                    'secret_access_key': 'dat_secret',
+                    'session_token': 'these_are_a_mile_long'
+                },
+                'relationships': {
+                    'clients': {
+                        'data': [{'id': 0}]
+                    }
+                }
+            }
         }
         files = ['cookies.txt', 'bad_cakes.zip']
         jba_mock.return_value.is_auth_preped.return_value = True

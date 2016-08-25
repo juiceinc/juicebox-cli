@@ -22,7 +22,7 @@ class S3Uploader:
             logger.debug('User missing auth information')
             raise AuthenticationError('Please login first.')
 
-    def get_s3_upload_token(self, client):
+    def get_s3_upload_token(self, client=None):
         logger.debug('Getting STS S3 Upload token')
         url = '{}/upload-token/'.format(PUBLIC_API_URL)
         data = {
@@ -47,7 +47,7 @@ class S3Uploader:
         logger.debug('Successfully retrieved STS S3 Upload token')
         return credentials
 
-    def upload(self, client):
+    def upload(self, client=None):
         credentials = self.get_s3_upload_token(client)
 
         logger.debug('Initializing S3 client')
