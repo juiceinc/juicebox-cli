@@ -22,14 +22,15 @@ class S3Uploader:
             logger.debug('User missing auth information')
             raise AuthenticationError('Please login first.')
 
-    def get_s3_upload_token(self):
+    def get_s3_upload_token(self, client):
         logger.debug('Getting STS S3 Upload token')
         url = '{}/upload-token/'.format(PUBLIC_API_URL)
         data = {
             'data': {
                 'attributes': {
                     'username': self.jb_auth.username,
-                    'token': self.jb_auth.token
+                    'token': self.jb_auth.token,
+                    'client': client
                 },
                 'type': 'jbtoken'
             }
@@ -42,21 +43,23 @@ class S3Uploader:
             logger.debug(response)
             raise AuthenticationError('Unable to authenticate you with '
                                       'those credentials')
-        credentials = response.json()['data']['attributes']
+        credentials = response.json()
         logger.debug('Successfully retrieved STS S3 Upload token')
         return credentials
 
-    def upload(self):
-        credentials = self.get_s3_upload_token()
+    def upload(self, client):
+        credentials = self.get_s3_upload_token(client)
 
         logger.debug('Initializing S3 client')
+        s3_creds = credentials['data']['attributes']
         client = boto3.client(
             's3',
-            aws_access_key_id=credentials['access_key_id'],
-            aws_secret_access_key=credentials['secret_access_key'],
-            aws_session_token=credentials['session_token'],
+            aws_access_key_id=s3_creds['access_key_id'],
+            aws_secret_access_key=s3_creds['secret_access_key'],
+            aws_session_token=s3_creds['session_token'],
         )
-
+        clients = credentials['data']['relationships']['clients']
+        client_id = clients['data'][0]['id']
         failed_files = []
         generated_folder = uuid.uuid4()
         for upload_file in self.files:
@@ -86,7 +89,8 @@ class S3Uploader:
                     ACL='bucket-owner-full-control',
                     Body=upload_file,
                     Bucket='juicebox-uploads-test',
-                    Key='client-1/{}/{}'.format(generated_folder, filename)
+                    Key='{}/{}/{}'.format(client_id, generated_folder,
+                                          filename)
                 )
                 logger.debug('Successfully uploaded: %s', upload_file)
             except Exception as exc_info:

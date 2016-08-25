@@ -49,8 +49,9 @@ def login(ctx, username):
                 type=click.Path(exists=True, dir_okay=True, readable=True))
 @click.option('--job')
 @click.option('--env', default='prod')
+@click.option('--client')
 @click.pass_context
-def upload(ctx, env, job, files):
+def upload(ctx, client, env, job, files):
     logger.debug('Starting upload for %s - %s: %s', env, job, files)
     if not files:
         logger.debug('No files to upload')
@@ -64,11 +65,14 @@ def upload(ctx, env, job, files):
 
     failed_files = None
     try:
-        failed_files = s3_uploader.upload()
+        failed_files = s3_uploader.upload(client)
     except requests.ConnectionError:
         message = 'Failed to connect to public API'
         logger.debug(message)
         click.echo(click.style(message, fg='red'))
+        ctx.abort()
+    except AuthenticationError as exc_info:
+        click.echo(click.style(str(exc_info), fg='red'))
         ctx.abort()
 
     if failed_files:
