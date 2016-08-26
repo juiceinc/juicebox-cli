@@ -38,11 +38,12 @@ class S3Uploader:
         headers = {'content-type': 'application/json'}
         response = requests.post(url, data=json.dumps(data),
                                  headers=headers)
-
-        if response.status_code != 200:
+        if response.status_code == 401:
             logger.debug(response)
-            raise AuthenticationError('Unable to authenticate you with '
-                                      'those credentials')
+            raise AuthenticationError(str(response.json()['error']))
+        elif response.status_code == 409:
+            logger.debug(response)
+            raise ValueError(response.json()['error'])
         credentials = response.json()
         logger.debug('Successfully retrieved STS S3 Upload token')
         return credentials

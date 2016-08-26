@@ -73,12 +73,12 @@ class TestS3Uploader:
         jba_mock.return_value.is_auth_preped.return_value = True
         jba_mock.return_value.username = 'chris@juice.com'
         jba_mock.return_value.token = 'cookies'
-        req_mock.post.return_value = Response(400, {})
+        req_mock.post.return_value = Response(401, {'error': 'cake'})
         files = ['cookies.txt', 'bad_cakes.zip']
         s3u = S3Uploader(files)
         with pytest.raises(AuthenticationError) as exc_info:
             s3u.get_s3_upload_token()
-            assert 'Unable to authenticate you with' in str(exc_info)
+            assert 'cake' in str(exc_info)
             assert jba_mock.mock_calls == [call(), call().is_auth_preped()]
             assert req_mock.mock_calls == [
                 call.post('http://api.juiceboxdata.com/upload-token/',

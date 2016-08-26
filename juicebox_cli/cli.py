@@ -6,6 +6,7 @@ import click
 import requests
 
 from juicebox_cli.auth import JuiceBoxAuthenticator
+from juicebox_cli.clients import JBClients
 from juicebox_cli.exceptions import AuthenticationError
 from juicebox_cli.logger import logger
 from juicebox_cli.upload import S3Uploader
@@ -83,3 +84,23 @@ def upload(ctx, client, env, job, files):
 
     logger.debug('upload successful')
     click.echo(click.style('Successfully Uploaded', fg='green'))
+
+
+@cli.command()
+@click.pass_context
+def clients_list(ctx):
+    try:
+        jb_clients = JBClients()
+        clients = jb_clients.get_simple_client_list()
+    except AuthenticationError as exc_info:
+        click.echo(click.style(str(exc_info), fg='red'))
+        ctx.abort()
+    except requests.ConnectionError:
+        message = 'Failed to connect to public API'
+        logger.debug(message)
+        click.echo(click.style(message, fg='red'))
+        ctx.abort()
+    click.echo('Client ID       Client Name')
+    click.echo('--------------  -------------------------------------')
+    for client_id, client_name in sorted(clients.items()):
+        click.echo('{:14}  {}'.format(client_id, client_name))
