@@ -19,7 +19,7 @@ class JuiceBoxAuthenticator:
         logger.debug('Initializing JBAuth via netrc')
         try:
             self.netrc_proxy = netrc.netrc()
-        except FileNotFoundError:
+        except OSError:
             netrc_filename = '.netrc'
             if os.name == 'nt':
                 netrc_filename = '_netrc'
