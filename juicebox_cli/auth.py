@@ -17,7 +17,15 @@ class JuiceBoxAuthenticator:
 
     def __init__(self, username=None, password=None):
         logger.debug('Initializing JBAuth via netrc')
-        self.netrc_proxy = netrc.netrc()
+        try:
+            self.netrc_proxy = netrc.netrc()
+        except FileNotFoundError:
+            netrc_filename = '.netrc'
+            if os.name == 'nt':
+                netrc_filename = '_netrc'
+            home = os.path.expanduser("~")
+            open(os.path.join(home, netrc_filename), 'w').close()
+            self.netrc_proxy = netrc.netrc()
         self.username = username
         self.password = password
 
