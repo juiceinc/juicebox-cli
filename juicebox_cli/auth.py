@@ -56,7 +56,7 @@ class JuiceBoxAuthenticator:
         response = requests.post(url, data=json.dumps(data), headers=headers)
         if response.status_code != 200:
             logger.debug(response)
-            raise AuthenticationError('I was unable to authenticate you with'
+            raise AuthenticationError('I was unable to authenticate you with '
                                       'those credentials')
         token = response.json()['token']
         self.token = token

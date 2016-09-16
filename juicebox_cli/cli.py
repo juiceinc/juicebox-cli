@@ -7,9 +7,17 @@ import requests
 
 from juicebox_cli.auth import JuiceBoxAuthenticator
 from juicebox_cli.clients import JBClients
+from juicebox_cli.config import PUBLIC_API_URLS
 from juicebox_cli.exceptions import AuthenticationError
 from juicebox_cli.logger import logger
 from juicebox_cli.upload import S3Uploader
+
+
+def validate_environment(env):
+    if not env in PUBLIC_API_URLS:
+        message = 'The supplied environment is not valid. Please choose ' \
+                  'from: {}.'.format(', '.join(PUBLIC_API_URLS.keys()))
+        click.echo(click.style(message, fg='red'))
 
 
 @click.group()
@@ -27,6 +35,7 @@ def cli(debug):
 @click.option('--env', default='prod')
 @click.pass_context
 def login(ctx, username, env):
+    validate_environment(env)
     logger.debug('Attempting login for %s', username)
     password = click.prompt('Password', type=str, hide_input=True)
 
@@ -54,6 +63,7 @@ def login(ctx, username, env):
 @click.option('--client', default=None)
 @click.pass_context
 def upload(ctx, client, env, job, files):
+    validate_environment(env)
     logger.debug('Starting upload for %s - %s: %s', env, job, files)
     if not files:
         logger.debug('No files to upload')
@@ -91,6 +101,7 @@ def upload(ctx, client, env, job, files):
 @click.option('--env', default='prod')
 @click.pass_context
 def clients_list(ctx, env):
+    validate_environment(env)
     try:
         jb_clients = JBClients(env)
         clients = jb_clients.get_simple_client_list()
