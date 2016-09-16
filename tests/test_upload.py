@@ -127,11 +127,11 @@ class TestS3Uploader:
                 call.client().put_object(
                     ACL='bucket-owner-full-control', Body='cookies.txt',
                     Bucket='juicebox-uploads-test',
-                    Key=ANY),
+                    Key=ANY, ServerSideEncryption='AES256'),
                 call.client().put_object(
                     ACL='bucket-owner-full-control', Body='bad_cakes.zip',
                     Bucket='juicebox-uploads-test',
-                    Key=ANY)
+                    Key=ANY, ServerSideEncryption='AES256')
             ]
             assert jba_mock.mock_calls == [call(), call().is_auth_preped()]
             assert not failures
@@ -169,11 +169,11 @@ class TestS3Uploader:
                 call.client().put_object(
                     ACL='bucket-owner-full-control', Body='cookies.txt',
                     Bucket='juicebox-uploads-test',
-                    Key=ANY),
+                    Key=ANY, ServerSideEncryption='AES256'),
                 call.client().put_object(
                     ACL='bucket-owner-full-control', Body='bad_cakes.zip',
                     Bucket='juicebox-uploads-test',
-                    Key=ANY)
+                    Key=ANY, ServerSideEncryption='AES256')
             ]
             assert jba_mock.mock_calls == [call(), call().is_auth_preped()]
             assert failures == ['bad_cakes.zip']

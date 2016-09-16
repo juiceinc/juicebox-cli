@@ -6,7 +6,7 @@ from juicebox_cli.cli import cli
 from juicebox_cli.exceptions import AuthenticationError
 
 
-class TestVagrant:
+class TestCLI:
 
     def test_base(self):
         runner = CliRunner()
@@ -28,7 +28,8 @@ class TestVagrant:
         prompt_mock.return_value = 'cookie'
         runner = CliRunner()
         result = runner.invoke(cli, ['login', 'chris@juice.com'])
-        assert jba_mock.mock_calls == [call('chris@juice.com', 'cookie'),
+        assert jba_mock.mock_calls == [call('chris@juice.com', 'cookie',
+                                            'prod'),
                                        call().get_juicebox_token(save=True)]
         assert 'Successfully Authenticated!' in result.output
         assert result.exit_code == 0
@@ -41,7 +42,8 @@ class TestVagrant:
         runner = CliRunner()
         result = runner.invoke(cli, ['--debug', 'login',
                                      'chris@juice.com'])
-        assert jba_mock.mock_calls == [call('chris@juice.com', 'cookie'),
+        assert jba_mock.mock_calls == [call('chris@juice.com', 'cookie',
+                                            'prod'),
                                        call().get_juicebox_token(
                                            save=True)]
         assert 'Successfully Authenticated!' in result.output
@@ -56,7 +58,8 @@ class TestVagrant:
             AuthenticationError('Bad Login')
         runner = CliRunner()
         result = runner.invoke(cli, ['login', 'chris@juice.com'])
-        assert jba_mock.mock_calls == [call('chris@juice.com', 'cookie'),
+        assert jba_mock.mock_calls == [call('chris@juice.com', 'cookie',
+                                            'prod'),
                                        call().get_juicebox_token(
                                            save=True)]
         assert 'Bad Login' in result.output
@@ -70,7 +73,8 @@ class TestVagrant:
             requests.ConnectionError('Boom!')
         runner = CliRunner()
         result = runner.invoke(cli, ['login', 'chris@juice.com'])
-        assert jba_mock.mock_calls == [call('chris@juice.com', 'cookie'),
+        assert jba_mock.mock_calls == [call('chris@juice.com', 'cookie',
+                                            'prod'),
                                        call().get_juicebox_token(
                                            save=True)]
         assert 'Failed to connect to public API' in result.output
@@ -140,7 +144,7 @@ class TestVagrant:
         jbc_mock.return_value.get_simple_client_list.return_value = clients
         runner = CliRunner()
         result = runner.invoke(cli, ['clients_list', ])
-        assert jbc_mock.mock_calls == [call(),
+        assert jbc_mock.mock_calls == [call('prod'),
                                        call().get_simple_client_list()]
         for client_id, name in clients.items():
             assert client_id in result.output
@@ -152,7 +156,7 @@ class TestVagrant:
         jbc_mock.side_effect = AuthenticationError('Bad Login')
         runner = CliRunner()
         result = runner.invoke(cli, ['clients_list', ])
-        assert jbc_mock.mock_calls == [call(), ]
+        assert jbc_mock.mock_calls == [call('prod'), ]
         assert 'Bad Login' in result.output
         assert result.exit_code == 1
 
@@ -162,7 +166,7 @@ class TestVagrant:
             requests.ConnectionError('Boom!')
         runner = CliRunner()
         result = runner.invoke(cli, ['clients_list', ])
-        assert jbc_mock.mock_calls == [call(),
+        assert jbc_mock.mock_calls == [call('prod'),
                                        call().get_simple_client_list()]
         assert 'Failed to connect to public API' in result.output
         assert result.exit_code == 1

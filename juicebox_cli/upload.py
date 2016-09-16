@@ -8,13 +8,14 @@ import boto3
 import requests
 
 from juicebox_cli.auth import JuiceBoxAuthenticator
-from juicebox_cli.config import PUBLIC_API_URL
+from juicebox_cli.config import PUBLIC_API_URLS
 from juicebox_cli.exceptions import AuthenticationError
 from juicebox_cli.logger import logger
 
 
 class S3Uploader:
-    def __init__(self, files):
+    def __init__(self, files, env='prod'):
+        self.env = env
         logger.debug('Initializing Uploader')
         self.files = list(files)
         self.jb_auth = JuiceBoxAuthenticator()
@@ -24,7 +25,7 @@ class S3Uploader:
 
     def get_s3_upload_token(self, client=None):
         logger.debug('Getting STS S3 Upload token')
-        url = '{}/upload-token/'.format(PUBLIC_API_URL)
+        url = '{}/upload-token/'.format(PUBLIC_API_URLS[self.env])
         data = {
             'data': {
                 'attributes': {
@@ -91,7 +92,8 @@ class S3Uploader:
                     Body=upload_file,
                     Bucket='juicebox-uploads-test',
                     Key='{}/{}/{}'.format(client_id, generated_folder,
-                                          filename)
+                                          filename),
+                    ServerSideEncryption='AES256'
                 )
                 logger.debug('Successfully uploaded: %s', upload_file)
             except Exception as exc_info:

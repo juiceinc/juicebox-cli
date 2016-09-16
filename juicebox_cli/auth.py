@@ -6,7 +6,7 @@ import os
 
 import requests
 
-from juicebox_cli.config import PUBLIC_API_URL, NETRC_HOST_NAME
+from juicebox_cli.config import PUBLIC_API_URLS, NETRC_HOST_NAME
 from juicebox_cli.exceptions import AuthenticationError
 from juicebox_cli.logger import logger
 
@@ -15,7 +15,8 @@ class JuiceBoxAuthenticator:
     netrc_proxy = None
     token = None
 
-    def __init__(self, username=None, password=None):
+    def __init__(self, username=None, password=None, env='prod'):
+        self.env = env
         logger.debug('Initializing JBAuth via netrc')
         try:
             self.netrc_proxy = netrc.netrc()
@@ -49,7 +50,7 @@ class JuiceBoxAuthenticator:
         :type save: bool
         """
         logger.debug('Getting JB token from Public API')
-        url = '{}/token/'.format(PUBLIC_API_URL)
+        url = '{}/token/'.format(PUBLIC_API_URLS[self.env])
         data = {'username': self.username, 'password': self.password}
         headers = {'content-type': 'application/json'}
         response = requests.post(url, data=json.dumps(data), headers=headers)

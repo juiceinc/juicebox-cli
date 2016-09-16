@@ -24,12 +24,13 @@ def cli(debug):
 
 @cli.command()
 @click.argument('username')
+@click.option('--env', default='prod')
 @click.pass_context
-def login(ctx, username):
+def login(ctx, username, env):
     logger.debug('Attempting login for %s', username)
     password = click.prompt('Password', type=str, hide_input=True)
 
-    jb_auth = JuiceBoxAuthenticator(username, password)
+    jb_auth = JuiceBoxAuthenticator(username, password, env)
     try:
         jb_auth.get_juicebox_token(save=True)
     except AuthenticationError as exc_info:
@@ -87,10 +88,11 @@ def upload(ctx, client, env, job, files):
 
 
 @cli.command()
+@click.option('--env', default='prod')
 @click.pass_context
-def clients_list(ctx):
+def clients_list(ctx, env):
     try:
-        jb_clients = JBClients()
+        jb_clients = JBClients(env)
         clients = jb_clients.get_simple_client_list()
     except AuthenticationError as exc_info:
         click.echo(click.style(str(exc_info), fg='red'))
