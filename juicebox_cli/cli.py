@@ -14,7 +14,7 @@ from juicebox_cli.upload import S3Uploader
 
 
 def validate_environment(env):
-    if not env in PUBLIC_API_URLS:
+    if env not in PUBLIC_API_URLS:
         message = 'The supplied environment is not valid. Please choose ' \
                   'from: {}.'.format(', '.join(PUBLIC_API_URLS.keys()))
         click.echo(click.style(message, fg='red'))
