@@ -20,7 +20,13 @@ class JuiceBoxAuthenticator:
         self.env = env
         logger.debug('Initializing JBAuth via netrc')
         try:
-            self.netrc_proxy = netrc.netrc()
+            if os.name == 'nt':
+                logger.debug('WINDOWS!')
+                home = os.path.expanduser('~')
+                netrc_file = os.path.join(home, '_netrc')
+                self.netrc_proxy = netrc.netrc(netrc_file)
+            else:
+                self.netrc_proxy = netrc.netrc()
         except:
             netrc_filename = '.netrc'
             if os.name == 'nt':
@@ -30,7 +36,7 @@ class JuiceBoxAuthenticator:
             open(netrc_file, 'w').close()
             if os.name != 'nt':
                 os.chmod(netrc_file, stat.S_IREAD | stat.S_IWRITE)
-            self.netrc_proxy = netrc.netrc()
+            self.netrc_proxy = netrc.netrc(netrc_file)
         self.username = username
         self.password = password
 
@@ -95,7 +101,8 @@ class JuiceBoxAuthenticator:
         netrc_os_file = os.path.expanduser('~/.netrc')
         if os.name == 'nt':
             logger.debug('WINDOWS!')
-            netrc_os_file = os.path.expanduser('$HOME\_netrc')
+            home = os.path.expanduser('~')
+            netrc_os_file = os.path.join(home, '_netrc')
         username, token = self.get_netrc_token()
         if username:
             logger.debug('Updating existing token')

@@ -78,7 +78,15 @@ class S3Uploader:
                 filename = upload_file.replace('../', '')
             elif upload_file.startswith('./'):
                 filename = upload_file.replace('./', '')
+            elif upload_file.startswith('..\\'):
+                filename = upload_file.replace('..\\', '')
+            elif upload_file.startswith('.\\'):
+                filename = upload_file.replace('.\\', '')
             elif upload_file.startswith('/'):
+                path, filename = os.path.split(upload_file)
+                parent, local = os.path.split(path)
+                filename = os.sep.join([local, filename])
+            elif ':\\' in upload_file:
                 path, filename = os.path.split(upload_file)
                 parent, local = os.path.split(path)
                 filename = os.sep.join([local, filename])
