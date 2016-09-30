@@ -123,7 +123,8 @@ class TestCLI:
         s3u_mock.side_effect = AuthenticationError('Bad Login')
         runner = CliRunner()
         result = runner.invoke(cli, ['upload', 'setup.py', 'setup.cfg'])
-        assert s3u_mock.mock_calls == [call(('setup.py', 'setup.cfg'), 'prod'), ]
+        assert s3u_mock.mock_calls == [call(('setup.py', 'setup.cfg'),
+                                            'prod'), ]
         assert 'Bad Login' in result.output
         assert result.exit_code == 1
 
