@@ -70,7 +70,7 @@ def upload(ctx, client, env, job, files):
         click.echo(click.style('No files to upload', fg='green'))
         return
     try:
-        s3_uploader = S3Uploader(files)
+        s3_uploader = S3Uploader(files, env)
     except AuthenticationError as exc_info:
         click.echo(click.style(str(exc_info), fg='red'))
         ctx.abort()

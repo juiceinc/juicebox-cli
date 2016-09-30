@@ -60,6 +60,7 @@ class S3Uploader:
             aws_secret_access_key=s3_creds['secret_access_key'],
             aws_session_token=s3_creds['session_token'],
         )
+        bucket = s3_creds['bucket']
         clients = credentials['data']['relationships']['clients']
         client_id = clients['data'][0]['id']
         failed_files = []
@@ -85,14 +86,14 @@ class S3Uploader:
                 logger.debug('%s: is a hidden file, skipping', upload_file)
                 continue
 
+            key = '{}/{}/{}'.format(client_id, generated_folder, filename)
             try:
                 logger.debug('Uploading file: %s', upload_file)
                 client.put_object(
                     ACL='bucket-owner-full-control',
                     Body=upload_file,
-                    Bucket='juicebox-uploads-test',
-                    Key='{}/{}/{}'.format(client_id, generated_folder,
-                                          filename),
+                    Bucket=bucket,
+                    Key=key,
                     ServerSideEncryption='AES256'
                 )
                 logger.debug('Successfully uploaded: %s', upload_file)
