@@ -55,7 +55,14 @@ class JuiceBoxAuthenticator:
         """
         logger.debug('Getting JB token from Public API')
         url = '{}/token/'.format(PUBLIC_API_URLS[self.env])
-        data = {'data':{'attributes':{'username': self.username, 'password': self.password}, 'type': 'auth'}}
+        data = {
+            'data': {
+                'attributes': {
+                    'username': self.username, 'password': self.password
+                },
+                'type': 'auth'
+            }
+        }
         headers = {'content-type': 'application/json'}
         response = requests.post(url, data=json.dumps(data), headers=headers)
         if response.status_code != 201:
