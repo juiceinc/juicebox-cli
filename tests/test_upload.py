@@ -60,7 +60,7 @@ class TestS3Uploader:
                 'attributes': {
                  'token': 'cookies',
                  'username': 'chris@juice.com',
-                 'client': None
+                 'client': None,
                 },
                 'type': 'jbtoken'
             }
@@ -104,7 +104,8 @@ class TestS3Uploader:
                 'attributes': {
                     'access_key_id': 'dis_key',
                     'secret_access_key': 'dat_secret',
-                    'session_token': 'these_are_a_mile_long'
+                    'session_token': 'these_are_a_mile_long',
+                    'bucket': 'bucket'
                 },
                 'relationships': {
                     'clients': {
@@ -126,11 +127,11 @@ class TestS3Uploader:
                     aws_session_token='these_are_a_mile_long'),
                 call.client().put_object(
                     ACL='bucket-owner-full-control', Body='cookies.txt',
-                    Bucket='juicebox-uploads-test',
+                    Bucket='bucket',
                     Key=ANY, ServerSideEncryption='AES256'),
                 call.client().put_object(
                     ACL='bucket-owner-full-control', Body='bad_cakes.zip',
-                    Bucket='juicebox-uploads-test',
+                    Bucket='bucket',
                     Key=ANY, ServerSideEncryption='AES256')
             ]
             assert jba_mock.mock_calls == [call(), call().is_auth_preped()]
@@ -144,7 +145,8 @@ class TestS3Uploader:
                 'attributes': {
                     'access_key_id': 'dis_key',
                     'secret_access_key': 'dat_secret',
-                    'session_token': 'these_are_a_mile_long'
+                    'session_token': 'these_are_a_mile_long',
+                    'bucket': 'bucket'
                 },
                 'relationships': {
                     'clients': {
@@ -168,11 +170,11 @@ class TestS3Uploader:
                     aws_session_token='these_are_a_mile_long'),
                 call.client().put_object(
                     ACL='bucket-owner-full-control', Body='cookies.txt',
-                    Bucket='juicebox-uploads-test',
+                    Bucket='bucket',
                     Key=ANY, ServerSideEncryption='AES256'),
                 call.client().put_object(
                     ACL='bucket-owner-full-control', Body='bad_cakes.zip',
-                    Bucket='juicebox-uploads-test',
+                    Bucket='bucket',
                     Key=ANY, ServerSideEncryption='AES256')
             ]
             assert jba_mock.mock_calls == [call(), call().is_auth_preped()]
