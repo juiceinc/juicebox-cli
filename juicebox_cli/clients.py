@@ -17,7 +17,7 @@ class JBClients:
             raise AuthenticationError('Please login first.')
 
     def get_simple_client_list(self):
-        logger.debug('Getting STS S3 Upload token')
+        logger.debug('Getting Clients list')
         url = '{}/clients/'.format(PUBLIC_API_URLS[self.env])
 
         headers = {'content-type': 'application/json',

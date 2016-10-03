@@ -33,7 +33,7 @@ def cli(debug):
 
 @cli.command()
 @click.argument('username')
-@click.option('--env', default='prod')
+@click.option('--env', envvar='JB_ENV', default='prod')
 @click.pass_context
 def login(ctx, username, env):
     validate_environment(ctx, env)
@@ -60,7 +60,7 @@ def login(ctx, username, env):
 @click.argument('files', nargs=-1,
                 type=click.Path(exists=True, dir_okay=True, readable=True))
 @click.option('--job')
-@click.option('--env', default='prod')
+@click.option('--env', envvar='JB_ENV', default='prod')
 @click.option('--client', default=None)
 @click.pass_context
 def upload(ctx, client, env, job, files):
@@ -99,7 +99,7 @@ def upload(ctx, client, env, job, files):
 
 
 @cli.command()
-@click.option('--env', default='prod')
+@click.option('--env', envvar='JB_ENV', default='prod')
 @click.pass_context
 def clients_list(ctx, env):
     validate_environment(ctx, env)

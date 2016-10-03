@@ -63,7 +63,9 @@ class JuiceBoxAuthenticator:
         data = {
             'data': {
                 'attributes': {
-                    'username': self.username, 'password': self.password
+                    'username': self.username,
+                    'password': self.password,
+                    'env': self.env
                 },
                 'type': 'auth'
             }
