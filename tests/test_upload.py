@@ -36,7 +36,7 @@ class TestS3Uploader:
             ]
             assert 'Please login first.' in str(exc_info)
 
-    @patch('juicebox_cli.upload.requests')
+    @patch('juicebox_cli.upload.jb_requests')
     @patch('juicebox_cli.upload.JuiceBoxAuthenticator')
     def test_get_s3_upload_token(self, jba_mock, req_mock):
         jba_mock.return_value.is_auth_preped.return_value = True
@@ -67,7 +67,7 @@ class TestS3Uploader:
         }
         assert data_dict == json.loads(first_call[2]['data'])
 
-    @patch('juicebox_cli.upload.requests')
+    @patch('juicebox_cli.upload.jb_requests')
     @patch('juicebox_cli.upload.JuiceBoxAuthenticator')
     def test_get_s3_upload_token_bad_auth(self, jba_mock, req_mock):
         jba_mock.return_value.is_auth_preped.return_value = True

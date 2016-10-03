@@ -5,12 +5,12 @@ import os
 import uuid
 
 import boto3
-import requests
 
 from juicebox_cli.auth import JuiceBoxAuthenticator
 from juicebox_cli.config import PUBLIC_API_URLS
 from juicebox_cli.exceptions import AuthenticationError
 from juicebox_cli.logger import logger
+from juicebox_cli.jb_requests import jb_requests
 
 
 class S3Uploader:
@@ -37,7 +37,7 @@ class S3Uploader:
             }
         }
         headers = {'content-type': 'application/json'}
-        response = requests.post(url, data=json.dumps(data),
+        response = jb_requests.post(url, data=json.dumps(data),
                                  headers=headers)
         if response.status_code == 401:
             logger.debug(response)

@@ -1,11 +1,10 @@
 """JB Clients commands
 """
-import requests
-
 from juicebox_cli.auth import JuiceBoxAuthenticator
 from juicebox_cli.config import PUBLIC_API_URLS
 from juicebox_cli.exceptions import AuthenticationError
 from juicebox_cli.logger import logger
+from juicebox_cli.jb_requests import jb_requests
 
 
 class JBClients:
@@ -23,7 +22,7 @@ class JBClients:
 
         headers = {'content-type': 'application/json',
                    'Authorization': 'Token {}'.format(self.jb_auth.token)}
-        response = requests.get(url, headers=headers)
+        response = jb_requests.get(url, headers=headers)
 
         if response.status_code != 200:
             logger.debug(response)

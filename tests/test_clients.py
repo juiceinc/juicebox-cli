@@ -30,7 +30,7 @@ class TestJBClients:
             ]
             assert 'Please login first.' in str(exc_info)
 
-    @patch('juicebox_cli.clients.requests')
+    @patch('juicebox_cli.clients.jb_requests')
     @patch('juicebox_cli.clients.JuiceBoxAuthenticator')
     def test_get_simple_client_list(self, jba_mock, req_mock):
         expected_results = {1: 'cookies', 2: 'brookies'}

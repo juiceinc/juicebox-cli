@@ -47,7 +47,7 @@ class TestJuiceBoxAuthenticator:
             assert netrc_mock.mock_calls == [call.netrc()]
 
     @patch('juicebox_cli.auth.netrc')
-    @patch('juicebox_cli.auth.requests')
+    @patch('juicebox_cli.auth.jb_requests')
     def test_get_juicebox_token(self, req_mock, netrc_mock):
         req_mock.post.return_value = Response(201, {
             'data': {
@@ -76,7 +76,7 @@ class TestJuiceBoxAuthenticator:
         assert netrc_mock.mock_calls == [call.netrc()]
 
     @patch('juicebox_cli.auth.netrc')
-    @patch('juicebox_cli.auth.requests')
+    @patch('juicebox_cli.auth.jb_requests')
     def test_get_juicebox_token_save(self, req_mock, netrc_mock):
         req_mock.post.return_value = Response(201, {
             'data': {
@@ -108,7 +108,7 @@ class TestJuiceBoxAuthenticator:
             assert netrc_mock.mock_calls == [call.netrc()]
 
     @patch('juicebox_cli.auth.netrc')
-    @patch('juicebox_cli.auth.requests')
+    @patch('juicebox_cli.auth.jb_requests')
     def test_get_juicebox_token_failed(self, req_mock, netrc_mock):
         req_mock.post.return_value = Response(409, {})
         jba = JuiceBoxAuthenticator(self.username, self.password)

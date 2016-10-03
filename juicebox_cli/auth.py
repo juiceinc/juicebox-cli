@@ -5,11 +5,10 @@ import netrc
 import os
 import stat
 
-import requests
-
 from juicebox_cli.config import PUBLIC_API_URLS, NETRC_HOST_NAME
 from juicebox_cli.exceptions import AuthenticationError
 from juicebox_cli.logger import logger
+from juicebox_cli.jb_requests import jb_requests
 
 
 class JuiceBoxAuthenticator:
@@ -70,7 +69,7 @@ class JuiceBoxAuthenticator:
             }
         }
         headers = {'content-type': 'application/json'}
-        response = requests.post(url, data=json.dumps(data), headers=headers)
+        response = jb_requests.post(url, data=json.dumps(data), headers=headers)
         if response.status_code != 201:
             logger.debug(response)
             raise AuthenticationError('I was unable to authenticate you with '
