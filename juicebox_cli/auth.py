@@ -69,7 +69,8 @@ class JuiceBoxAuthenticator:
             }
         }
         headers = {'content-type': 'application/json'}
-        response = jb_requests.post(url, data=json.dumps(data), headers=headers)
+        response = jb_requests.post(url, data=json.dumps(data),
+                                    headers=headers)
         if response.status_code != 201:
             logger.debug(response)
             raise AuthenticationError('I was unable to authenticate you with '

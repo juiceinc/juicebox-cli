@@ -38,7 +38,7 @@ class S3Uploader:
         }
         headers = {'content-type': 'application/json'}
         response = jb_requests.post(url, data=json.dumps(data),
-                                 headers=headers)
+                                    headers=headers)
         if response.status_code == 401:
             logger.debug(response)
             raise AuthenticationError(str(response.json()['error']))
