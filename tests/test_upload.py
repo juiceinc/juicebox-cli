@@ -51,7 +51,7 @@ class TestS3Uploader:
         assert results == {'data': {'attributes': credentials}}
         assert jba_mock.mock_calls == [call(), call().is_auth_preped()]
         assert req_mock.mock_calls == [
-            call.post('http://api.juiceboxdata.com/upload-token/',
+            call.post('https://api.juiceboxdata.com/upload-token/',
                       data=ANY,
                       headers={'content-type': 'application/json'})]
         first_call = req_mock.mock_calls[0]
@@ -81,7 +81,7 @@ class TestS3Uploader:
             assert 'cake' in str(exc_info)
             assert jba_mock.mock_calls == [call(), call().is_auth_preped()]
             assert req_mock.mock_calls == [
-                call.post('http://api.juiceboxdata.com/upload-token/',
+                call.post('https://api.juiceboxdata.com/upload-token/',
                           data=ANY,
                           headers={'content-type': 'application/json'})]
             first_call = req_mock.mock_calls[0]

@@ -60,7 +60,7 @@ class TestJuiceBoxAuthenticator:
         jba.get_juicebox_token()
         assert jba.token == 'dis_token'
         assert req_mock.mock_calls == [
-            call.post('http://api.juiceboxdata.com/token/',
+            call.post('https://api.juiceboxdata.com/token/',
                       data=ANY,
                       headers={'content-type': 'application/json'})]
         first_call = req_mock.mock_calls[0]
@@ -91,7 +91,7 @@ class TestJuiceBoxAuthenticator:
             jba.get_juicebox_token(save=True)
             assert jba.token == 'dis_token'
             assert req_mock.mock_calls == [
-                call.post('http://api.juiceboxdata.com/token/',
+                call.post('https://api.juiceboxdata.com/token/',
                           data=ANY,
                           headers={'content-type': 'application/json'})]
             first_call = req_mock.mock_calls[0]
@@ -116,7 +116,7 @@ class TestJuiceBoxAuthenticator:
             jba.get_juicebox_token()
             assert 'unable to authenticate' in str(exc_info)
             assert req_mock.mock_calls == [
-                call.post('http://api.juiceboxdata.com/token/',
+                call.post('https://api.juiceboxdata.com/token/',
                           data=ANY,
                           headers={'content-type': 'application/json'})]
             first_call = req_mock.mock_calls[0]
