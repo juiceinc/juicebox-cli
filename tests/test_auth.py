@@ -67,7 +67,8 @@ class TestJuiceBoxAuthenticator:
         data_dict = {
             'data': {
                 'attributes': {
-                    'password': self.password, 'username': self.username
+                    'password': self.password, 'username': self.username,
+                    'env': 'prod'
                 },
                 'type': 'auth'
             }
@@ -98,7 +99,8 @@ class TestJuiceBoxAuthenticator:
             data_dict = {
                 'data': {
                     'attributes': {
-                        'password': self.password, 'username': self.username
+                        'password': self.password, 'username': self.username,
+                        'env': 'prod'
                     },
                     'type': 'auth'
                 }
