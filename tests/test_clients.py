@@ -46,7 +46,7 @@ class TestJBClients:
         assert call().is_auth_preped() in jba_mock.mock_calls
         assert expected_results == results
         assert req_mock.mock_calls == [
-            call.get('https://api.juiceboxdata.com/clients/',
+            call.get('https://api.juiceboxdata.com/clients/?env=prod',
                      headers={'content-type': 'application/json',
                               'Authorization': ANY})
         ]

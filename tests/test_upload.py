@@ -58,9 +58,10 @@ class TestS3Uploader:
         data_dict = {
             'data': {
                 'attributes': {
-                 'token': 'cookies',
-                 'username': 'chris@juice.com',
-                 'client': None,
+                    'token': 'cookies',
+                    'username': 'chris@juice.com',
+                    'client': None,
+                    'env': 'prod'
                 },
                 'type': 'jbtoken'
             }
