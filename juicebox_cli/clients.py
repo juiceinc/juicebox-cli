@@ -18,7 +18,7 @@ class JBClients:
 
     def get_simple_client_list(self):
         logger.debug('Getting Clients list')
-        url = '{}/clients/'.format(PUBLIC_API_URLS[self.env])
+        url = '{}/clients/?env={}'.format(PUBLIC_API_URLS[self.env], self.env)
 
         headers = {'content-type': 'application/json',
                    'Authorization': 'Token {}'.format(self.jb_auth.token)}
