@@ -31,7 +31,8 @@ class S3Uploader:
                 'attributes': {
                     'username': self.jb_auth.username,
                     'token': self.jb_auth.token,
-                    'client': client
+                    'client': client,
+                    'env': self.env
                 },
                 'type': 'jbtoken'
             }
