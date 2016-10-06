@@ -20,9 +20,11 @@ Upgrading
 
 Occasionally, we release new versions of the juicebox-cli with an expanded feature sets or security updates. To upgrade juicebox-cli, run this command in your terminal::
 
-    $ pip install juicebox-cli
+    $ pip install -U juicebox-cli
 
 Getting Started by Logging In
+-----------------------------
+
 After juicebox-cli has been installed, the juice command will be available. To begin using the CLI, we need to start by logging into Juicebox. Run the following command in your terminal replacing user@domain.com with the email of your Juicebox account::
 
     $ juice login user@domain.com
