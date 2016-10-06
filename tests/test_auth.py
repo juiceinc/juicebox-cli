@@ -47,42 +47,70 @@ class TestJuiceBoxAuthenticator:
             assert netrc_mock.mock_calls == [call.netrc()]
 
     @patch('juicebox_cli.auth.netrc')
-    @patch('juicebox_cli.auth.requests')
+    @patch('juicebox_cli.auth.jb_requests')
     def test_get_juicebox_token(self, req_mock, netrc_mock):
-        req_mock.post.return_value = Response(200, {'token': 'dis_token'})
+        req_mock.post.return_value = Response(201, {
+            'data': {
+                'attributes': {
+                    'token': 'dis_token'
+                }
+            }
+        })
         jba = JuiceBoxAuthenticator(self.username, self.password)
         jba.get_juicebox_token()
         assert jba.token == 'dis_token'
         assert req_mock.mock_calls == [
-            call.post('http://api.juiceboxdata.com/token/',
+            call.post('https://api.juiceboxdata.com/token/',
                       data=ANY,
                       headers={'content-type': 'application/json'})]
         first_call = req_mock.mock_calls[0]
-        data_dict = {'password': self.password, 'username': self.username}
+        data_dict = {
+            'data': {
+                'attributes': {
+                    'password': self.password, 'username': self.username,
+                    'env': 'prod'
+                },
+                'type': 'auth'
+            }
+        }
         assert data_dict == json.loads(first_call[2]['data'])
         assert netrc_mock.mock_calls == [call.netrc()]
 
     @patch('juicebox_cli.auth.netrc')
-    @patch('juicebox_cli.auth.requests')
+    @patch('juicebox_cli.auth.jb_requests')
     def test_get_juicebox_token_save(self, req_mock, netrc_mock):
-        req_mock.post.return_value = Response(200, {'token': 'dis_token'})
+        req_mock.post.return_value = Response(201, {
+            'data': {
+                'attributes': {
+                    'token': 'dis_token'
+                }
+            }
+        })
         with patch.object(JuiceBoxAuthenticator, 'update_netrc',
                           return_value=None) as update_mock:
             jba = JuiceBoxAuthenticator(self.username, self.password)
             jba.get_juicebox_token(save=True)
             assert jba.token == 'dis_token'
             assert req_mock.mock_calls == [
-                call.post('http://api.juiceboxdata.com/token/',
+                call.post('https://api.juiceboxdata.com/token/',
                           data=ANY,
                           headers={'content-type': 'application/json'})]
             first_call = req_mock.mock_calls[0]
-            data_dict = {'password': self.password, 'username': self.username}
+            data_dict = {
+                'data': {
+                    'attributes': {
+                        'password': self.password, 'username': self.username,
+                        'env': 'prod'
+                    },
+                    'type': 'auth'
+                }
+            }
             assert data_dict == json.loads(first_call[2]['data'])
             assert update_mock.mock_calls == [call()]
             assert netrc_mock.mock_calls == [call.netrc()]
 
     @patch('juicebox_cli.auth.netrc')
-    @patch('juicebox_cli.auth.requests')
+    @patch('juicebox_cli.auth.jb_requests')
     def test_get_juicebox_token_failed(self, req_mock, netrc_mock):
         req_mock.post.return_value = Response(409, {})
         jba = JuiceBoxAuthenticator(self.username, self.password)
@@ -90,7 +118,7 @@ class TestJuiceBoxAuthenticator:
             jba.get_juicebox_token()
             assert 'unable to authenticate' in str(exc_info)
             assert req_mock.mock_calls == [
-                call.post('http://api.juiceboxdata.com/token/',
+                call.post('https://api.juiceboxdata.com/token/',
                           data=ANY,
                           headers={'content-type': 'application/json'})]
             first_call = req_mock.mock_calls[0]

@@ -5,12 +5,12 @@ import os
 import uuid
 
 import boto3
-import requests
 
 from juicebox_cli.auth import JuiceBoxAuthenticator
 from juicebox_cli.config import PUBLIC_API_URLS
 from juicebox_cli.exceptions import AuthenticationError
 from juicebox_cli.logger import logger
+from juicebox_cli.jb_requests import jb_requests
 
 
 class S3Uploader:
@@ -31,14 +31,15 @@ class S3Uploader:
                 'attributes': {
                     'username': self.jb_auth.username,
                     'token': self.jb_auth.token,
-                    'client': client
+                    'client': client,
+                    'env': self.env
                 },
                 'type': 'jbtoken'
             }
         }
         headers = {'content-type': 'application/json'}
-        response = requests.post(url, data=json.dumps(data),
-                                 headers=headers)
+        response = jb_requests.post(url, data=json.dumps(data),
+                                    headers=headers)
         if response.status_code == 401:
             logger.debug(response)
             raise AuthenticationError(str(response.json()['error']))
@@ -60,6 +61,7 @@ class S3Uploader:
             aws_secret_access_key=s3_creds['secret_access_key'],
             aws_session_token=s3_creds['session_token'],
         )
+        bucket = s3_creds['bucket']
         clients = credentials['data']['relationships']['clients']
         client_id = clients['data'][0]['id']
         failed_files = []
@@ -77,7 +79,15 @@ class S3Uploader:
                 filename = upload_file.replace('../', '')
             elif upload_file.startswith('./'):
                 filename = upload_file.replace('./', '')
+            elif upload_file.startswith('..\\'):
+                filename = upload_file.replace('..\\', '')
+            elif upload_file.startswith('.\\'):
+                filename = upload_file.replace('.\\', '')
             elif upload_file.startswith('/'):
+                path, filename = os.path.split(upload_file)
+                parent, local = os.path.split(path)
+                filename = os.sep.join([local, filename])
+            elif ':\\' in upload_file:
                 path, filename = os.path.split(upload_file)
                 parent, local = os.path.split(path)
                 filename = os.sep.join([local, filename])
@@ -85,14 +95,14 @@ class S3Uploader:
                 logger.debug('%s: is a hidden file, skipping', upload_file)
                 continue
 
+            key = '{}/{}/{}'.format(client_id, generated_folder, filename)
             try:
                 logger.debug('Uploading file: %s', upload_file)
                 client.put_object(
                     ACL='bucket-owner-full-control',
                     Body=upload_file,
-                    Bucket='juicebox-uploads-test',
-                    Key='{}/{}/{}'.format(client_id, generated_folder,
-                                          filename),
+                    Bucket=bucket,
+                    Key=key,
                     ServerSideEncryption='AES256'
                 )
                 logger.debug('Successfully uploaded: %s', upload_file)

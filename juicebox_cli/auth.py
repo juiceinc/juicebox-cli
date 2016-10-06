@@ -3,12 +3,12 @@
 import json
 import netrc
 import os
-
-import requests
+import stat
 
 from juicebox_cli.config import PUBLIC_API_URLS, NETRC_HOST_NAME
 from juicebox_cli.exceptions import AuthenticationError
 from juicebox_cli.logger import logger
+from juicebox_cli.jb_requests import jb_requests
 
 
 class JuiceBoxAuthenticator:
@@ -19,14 +19,23 @@ class JuiceBoxAuthenticator:
         self.env = env
         logger.debug('Initializing JBAuth via netrc')
         try:
-            self.netrc_proxy = netrc.netrc()
-        except OSError:
+            if os.name == 'nt':
+                logger.debug('WINDOWS!')
+                home = os.path.expanduser('~')
+                netrc_file = os.path.join(home, '_netrc')
+                self.netrc_proxy = netrc.netrc(netrc_file)
+            else:
+                self.netrc_proxy = netrc.netrc()
+        except:
             netrc_filename = '.netrc'
             if os.name == 'nt':
                 netrc_filename = '_netrc'
             home = os.path.expanduser("~")
-            open(os.path.join(home, netrc_filename), 'w').close()
-            self.netrc_proxy = netrc.netrc()
+            netrc_file = os.path.join(home, netrc_filename)
+            open(netrc_file, 'w').close()
+            if os.name != 'nt':
+                os.chmod(netrc_file, stat.S_IREAD | stat.S_IWRITE)
+            self.netrc_proxy = netrc.netrc(netrc_file)
         self.username = username
         self.password = password
 
@@ -51,14 +60,24 @@ class JuiceBoxAuthenticator:
         """
         logger.debug('Getting JB token from Public API')
         url = '{}/token/'.format(PUBLIC_API_URLS[self.env])
-        data = {'username': self.username, 'password': self.password}
+        data = {
+            'data': {
+                'attributes': {
+                    'username': self.username,
+                    'password': self.password,
+                    'env': self.env
+                },
+                'type': 'auth'
+            }
+        }
         headers = {'content-type': 'application/json'}
-        response = requests.post(url, data=json.dumps(data), headers=headers)
-        if response.status_code != 200:
+        response = jb_requests.post(url, data=json.dumps(data),
+                                    headers=headers)
+        if response.status_code != 201:
             logger.debug(response)
             raise AuthenticationError('I was unable to authenticate you with '
                                       'those credentials')
-        token = response.json()['token']
+        token = response.json()['data']['attributes']['token']
         self.token = token
         logger.debug('Successfully retrieved JB token')
 
@@ -84,7 +103,8 @@ class JuiceBoxAuthenticator:
         netrc_os_file = os.path.expanduser('~/.netrc')
         if os.name == 'nt':
             logger.debug('WINDOWS!')
-            netrc_os_file = os.path.expanduser('$HOME\_netrc')
+            home = os.path.expanduser('~')
+            netrc_os_file = os.path.join(home, '_netrc')
         username, token = self.get_netrc_token()
         if username:
             logger.debug('Updating existing token')
@@ -104,7 +124,8 @@ class JuiceBoxAuthenticator:
             logger.debug('Adding new JB entry')
             with open(netrc_os_file) as netrc_file:
                 output_lines = netrc_file.readlines()
-                output_lines[-1] = output_lines[-1] + '\n'
+                if output_lines:
+                    output_lines[-1] = output_lines[-1] + '\n'
         logger.debug('Building JB entry')
         output_lines.append('machine api.juiceboxdata.com\n')
         output_lines.append('  login {}\n'.format(self.username))

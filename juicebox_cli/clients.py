@@ -1,11 +1,10 @@
 """JB Clients commands
 """
-import requests
-
 from juicebox_cli.auth import JuiceBoxAuthenticator
 from juicebox_cli.config import PUBLIC_API_URLS
 from juicebox_cli.exceptions import AuthenticationError
 from juicebox_cli.logger import logger
+from juicebox_cli.jb_requests import jb_requests
 
 
 class JBClients:
@@ -18,12 +17,12 @@ class JBClients:
             raise AuthenticationError('Please login first.')
 
     def get_simple_client_list(self):
-        logger.debug('Getting STS S3 Upload token')
-        url = '{}/clients/'.format(PUBLIC_API_URLS[self.env])
+        logger.debug('Getting Clients list')
+        url = '{}/clients/?env={}'.format(PUBLIC_API_URLS[self.env], self.env)
 
         headers = {'content-type': 'application/json',
                    'Authorization': 'Token {}'.format(self.jb_auth.token)}
-        response = requests.get(url, headers=headers)
+        response = jb_requests.get(url, headers=headers)
 
         if response.status_code != 200:
             logger.debug(response)
