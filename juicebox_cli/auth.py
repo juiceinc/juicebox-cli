@@ -33,7 +33,8 @@ class JuiceBoxAuthenticator:
         except Exception as exc_info:
             if netrc_location:
                 logger.debug(str(exc_info))
-                raise ValueError('Could not read token from %s', netrc_location)
+                raise ValueError('Could not read token from %s',
+                                 netrc_location)
             netrc_filename = '.netrc'
             if os.name == 'nt':
                 netrc_filename = '_netrc'

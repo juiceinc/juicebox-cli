@@ -136,7 +136,8 @@ class TestCLI:
             requests.ConnectionError('Boom!')
         runner = CliRunner()
         result = runner.invoke(cli, ['upload', 'setup.py', 'setup.cfg'])
-        assert s3u_mock.mock_calls == [call(('setup.py', 'setup.cfg'), 'prod', None),
+        assert s3u_mock.mock_calls == [call(('setup.py', 'setup.cfg'), 'prod',
+                                            None),
                                        call().upload(None)]
         assert 'Failed to connect to public API' in result.output
         assert result.exit_code == 1
