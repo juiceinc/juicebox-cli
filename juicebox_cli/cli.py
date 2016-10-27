@@ -59,11 +59,12 @@ def login(ctx, username, env):
 @cli.command()
 @click.argument('files', nargs=-1,
                 type=click.Path(exists=True, dir_okay=True, readable=True))
+@click.option('--netrc', default=None)
 @click.option('--job')
 @click.option('--env', envvar='JB_ENV', default='prod')
 @click.option('--client', default=None)
 @click.pass_context
-def upload(ctx, client, env, job, files):
+def upload(ctx, client, env, job, netrc, files):
     validate_environment(ctx, env)
     logger.debug('Starting upload for %s - %s: %s', env, job, files)
     if not files:
@@ -71,7 +72,7 @@ def upload(ctx, client, env, job, files):
         click.echo(click.style('No files to upload', fg='green'))
         return
     try:
-        s3_uploader = S3Uploader(files, env)
+        s3_uploader = S3Uploader(files, env, netrc)
     except AuthenticationError as exc_info:
         click.echo(click.style(str(exc_info), fg='red'))
         ctx.abort()

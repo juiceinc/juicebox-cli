@@ -15,18 +15,25 @@ class JuiceBoxAuthenticator:
     netrc_proxy = None
     token = None
 
-    def __init__(self, username=None, password=None, env='prod'):
+    def __init__(self, username=None, password=None, env='prod',
+                 netrc_location=None):
         self.env = env
         logger.debug('Initializing JBAuth via netrc')
         try:
-            if os.name == 'nt':
-                logger.debug('WINDOWS!')
+            if netrc_location:
+                logger.debug('Using user defined netrc_file %s',
+                             netrc_location)
+                self.netrc_proxy = netrc.netrc(netrc_location)
+                logger.debug('Trying to use Windows _netrc')
                 home = os.path.expanduser('~')
                 netrc_file = os.path.join(home, '_netrc')
                 self.netrc_proxy = netrc.netrc(netrc_file)
             else:
                 self.netrc_proxy = netrc.netrc()
-        except:
+        except Exception as exc_info:
+            if netrc_location:
+                logger.debug(str(exc_info))
+                raise ValueError('Could not read token from %s', netrc_location)
             netrc_filename = '.netrc'
             if os.name == 'nt':
                 netrc_filename = '_netrc'

@@ -49,7 +49,8 @@ class TestS3Uploader:
         s3u = S3Uploader(files)
         results = s3u.get_s3_upload_token()
         assert results == {'data': {'attributes': credentials}}
-        assert jba_mock.mock_calls == [call(), call().is_auth_preped()]
+        assert jba_mock.mock_calls == [call(netrc_location=None),
+                                       call().is_auth_preped()]
         assert req_mock.mock_calls == [
             call.post('https://api.juiceboxdata.com/upload-token/',
                       data=ANY,
@@ -135,7 +136,8 @@ class TestS3Uploader:
                     Bucket='bucket',
                     Key=ANY, ServerSideEncryption='AES256')
             ]
-            assert jba_mock.mock_calls == [call(), call().is_auth_preped()]
+            assert jba_mock.mock_calls == [call(netrc_location=None),
+                                           call().is_auth_preped()]
             assert not failures
 
     @patch('juicebox_cli.upload.boto3')
@@ -178,5 +180,6 @@ class TestS3Uploader:
                     Bucket='bucket',
                     Key=ANY, ServerSideEncryption='AES256')
             ]
-            assert jba_mock.mock_calls == [call(), call().is_auth_preped()]
+            assert jba_mock.mock_calls == [call(netrc_location=None),
+                                           call().is_auth_preped()]
             assert failures == ['bad_cakes.zip']

@@ -14,11 +14,11 @@ from juicebox_cli.jb_requests import jb_requests
 
 
 class S3Uploader:
-    def __init__(self, files, env='prod'):
+    def __init__(self, files, env='prod', netrc=None):
         self.env = env
         logger.debug('Initializing Uploader')
         self.files = list(files)
-        self.jb_auth = JuiceBoxAuthenticator()
+        self.jb_auth = JuiceBoxAuthenticator(netrc_location=netrc)
         if not self.jb_auth.is_auth_preped():
             logger.debug('User missing auth information')
             raise AuthenticationError('Please login first.')
