@@ -11,45 +11,90 @@ from tests.response import Response
 class TestJuiceBoxAuthenticator:
     username = 'cookie monster'
     password = 'cIsForCookie'
+    windows_home_path = 'c:\\users\\some_user'
+    windows_netrc_file = 'c:\\users\\some_user\_netrc'
 
+    @patch('juicebox_cli.auth.os.path')
     @patch('juicebox_cli.auth.netrc')
-    def test_init(self, netrc_mock):
+    def test_init(self, netrc_mock, path_mock):
+        path_mock.expanduser.return_value = self.windows_home_path
+        path_mock.join.return_value = self.windows_netrc_file
         jba = JuiceBoxAuthenticator(self.username, self.password)
-        assert netrc_mock.mock_calls == [call.netrc()]
+        if os.name == 'nt':
+            assert netrc_mock.mock_calls == [
+                call.netrc(self.windows_netrc_file)]
+            assert path_mock.mock_calls == [
+                call.expanduser('~'),
+                call.join(self.windows_home_path, '_netrc')]
+        else:
+            assert netrc_mock.mock_calls == [call.netrc()]
         assert jba.username == self.username
         assert jba.password == self.password
 
+    @patch('juicebox_cli.auth.os.path')
     @patch('juicebox_cli.auth.netrc')
-    def test_is_auth_preped_with_token(self, netrc_mock):
+    def test_is_auth_preped_with_token(self, netrc_mock, path_mock):
+        path_mock.expanduser.return_value = self.windows_home_path
+        path_mock.join.return_value = self.windows_netrc_file
         jba = JuiceBoxAuthenticator(self.username, self.password)
         jba.token = 'token'
         result = jba.is_auth_preped()
         assert result is True
-        assert netrc_mock.mock_calls == [call.netrc()]
+        if os.name == 'nt':
+            assert netrc_mock.mock_calls == [
+                call.netrc(self.windows_netrc_file)]
+            assert path_mock.mock_calls == [
+                call.expanduser('~'),
+                call.join(self.windows_home_path, '_netrc')]
+        else:
+            assert netrc_mock.mock_calls == [call.netrc()]
 
+    @patch('juicebox_cli.auth.os.path')
     @patch('juicebox_cli.auth.netrc')
-    def test_is_auth_preped_in_netrc(self, netrc_mock):
+    def test_is_auth_preped_in_netrc(self, netrc_mock, path_mock):
+        path_mock.expanduser.return_value = self.windows_home_path
+        path_mock.join.return_value = self.windows_netrc_file
         with patch.object(JuiceBoxAuthenticator, 'get_netrc_token',
                           return_value=(self.username, 'token')) as token_mock:
             jba = JuiceBoxAuthenticator(self.username, self.password)
             result = jba.is_auth_preped()
             assert result is True
             assert token_mock.mock_calls == [call()]
-            assert netrc_mock.mock_calls == [call.netrc()]
+            if os.name == 'nt':
+                assert netrc_mock.mock_calls == [
+                    call.netrc(self.windows_netrc_file)]
+                assert path_mock.mock_calls == [
+                    call.expanduser('~'),
+                    call.join(self.windows_home_path, '_netrc')]
+            else:
+                assert netrc_mock.mock_calls == [call.netrc()]
 
+    @patch('juicebox_cli.auth.os.path')
     @patch('juicebox_cli.auth.netrc')
-    def test_is_auth_preped_no_token_or_netrc(self, netrc_mock):
+    def test_is_auth_preped_no_token_or_netrc(self, netrc_mock, path_mock):
+        path_mock.expanduser.return_value = self.windows_home_path
+        path_mock.join.return_value = self.windows_netrc_file
         with patch.object(JuiceBoxAuthenticator, 'get_netrc_token',
                           return_value=(None, None)) as token_mock:
             jba = JuiceBoxAuthenticator(self.username, self.password)
             result = jba.is_auth_preped()
             assert result is False
             assert token_mock.mock_calls == [call()]
-            assert netrc_mock.mock_calls == [call.netrc()]
+            if os.name == 'nt':
+                assert netrc_mock.mock_calls == [
+                    call.netrc(self.windows_netrc_file)]
+                assert path_mock.mock_calls == [
+                    call.expanduser('~'),
+                    call.join(self.windows_home_path, '_netrc')]
+            else:
+                assert netrc_mock.mock_calls == [call.netrc()]
 
+    @patch('juicebox_cli.auth.os.path')
     @patch('juicebox_cli.auth.netrc')
     @patch('juicebox_cli.auth.jb_requests')
-    def test_get_juicebox_token(self, req_mock, netrc_mock):
+    def test_get_juicebox_token(self, req_mock, netrc_mock, path_mock):
+        path_mock.expanduser.return_value = self.windows_home_path
+        path_mock.join.return_value = self.windows_netrc_file
         req_mock.post.return_value = Response(201, {
             'data': {
                 'attributes': {
@@ -75,11 +120,21 @@ class TestJuiceBoxAuthenticator:
             }
         }
         assert data_dict == json.loads(first_call[2]['data'])
-        assert netrc_mock.mock_calls == [call.netrc()]
+        if os.name == 'nt':
+            assert netrc_mock.mock_calls == [
+                call.netrc(self.windows_netrc_file)]
+            assert path_mock.mock_calls == [
+                call.expanduser('~'),
+                call.join(self.windows_home_path, '_netrc')]
+        else:
+            assert netrc_mock.mock_calls == [call.netrc()]
 
+    @patch('juicebox_cli.auth.os.path')
     @patch('juicebox_cli.auth.netrc')
     @patch('juicebox_cli.auth.jb_requests')
-    def test_get_juicebox_token_save(self, req_mock, netrc_mock):
+    def test_get_juicebox_token_save(self, req_mock, netrc_mock, path_mock):
+        path_mock.expanduser.return_value = self.windows_home_path
+        path_mock.join.return_value = self.windows_netrc_file
         req_mock.post.return_value = Response(201, {
             'data': {
                 'attributes': {
@@ -108,7 +163,14 @@ class TestJuiceBoxAuthenticator:
             }
             assert data_dict == json.loads(first_call[2]['data'])
             assert update_mock.mock_calls == [call()]
-            assert netrc_mock.mock_calls == [call.netrc()]
+            if os.name == 'nt':
+                assert netrc_mock.mock_calls == [
+                    call.netrc(self.windows_netrc_file)]
+                assert path_mock.mock_calls == [
+                    call.expanduser('~'),
+                    call.join(self.windows_home_path, '_netrc')]
+            else:
+                assert netrc_mock.mock_calls == [call.netrc()]
 
     @patch('juicebox_cli.auth.netrc')
     @patch('juicebox_cli.auth.jb_requests')
@@ -127,29 +189,53 @@ class TestJuiceBoxAuthenticator:
             assert data_dict == json.loads(first_call[2]['data'])
             assert netrc_mock.mock_calls == [call.netrc()]
 
+    @patch('juicebox_cli.auth.os.path')
     @patch('juicebox_cli.auth.netrc')
-    def test_get_netrc_token(self, netrc_mock):
+    def test_get_netrc_token(self, netrc_mock, path_mock):
+        path_mock.expanduser.return_value = self.windows_home_path
+        path_mock.join.return_value = self.windows_netrc_file
         auth_fake = ('chris@juice.com', None,
                      'token')
         netrc_mock.netrc.return_value.authenticators.return_value = auth_fake
         jba = JuiceBoxAuthenticator(self.username, self.password)
         username, token = jba.get_netrc_token()
-        assert netrc_mock.mock_calls == [
-            call.netrc(),
-            call.netrc().authenticators('api.juiceboxdata.com')
-        ]
+        if os.name == 'nt':
+            assert netrc_mock.mock_calls == [
+                call.netrc(self.windows_netrc_file),
+                call.netrc().authenticators('api.juiceboxdata.com')
+            ]
+            assert path_mock.mock_calls == [
+                call.expanduser('~'),
+                call.join(self.windows_home_path, '_netrc')]
+        else:
+            assert netrc_mock.mock_calls == [
+                call.netrc(),
+                call.netrc().authenticators('api.juiceboxdata.com')
+            ]
         assert username == 'chris@juice.com'
         assert token == 'token'
 
+    @patch('juicebox_cli.auth.os.path')
     @patch('juicebox_cli.auth.netrc')
-    def test_get_netrc_token_not_found(self, netrc_mock):
+    def test_get_netrc_token_not_found(self, netrc_mock, path_mock):
+        path_mock.expanduser.return_value = self.windows_home_path
+        path_mock.join.return_value = self.windows_netrc_file
         netrc_mock.netrc.return_value.authenticators.return_value = ()
         jba = JuiceBoxAuthenticator(self.username, self.password)
         username, token = jba.get_netrc_token()
-        assert netrc_mock.mock_calls == [
-            call.netrc(),
-            call.netrc().authenticators('api.juiceboxdata.com')
-        ]
+        if os.name == 'nt':
+            assert netrc_mock.mock_calls == [
+                call.netrc(self.windows_netrc_file),
+                call.netrc().authenticators('api.juiceboxdata.com')
+            ]
+            assert path_mock.mock_calls == [
+                call.expanduser('~'),
+                call.join(self.windows_home_path, '_netrc')]
+        else:
+            assert netrc_mock.mock_calls == [
+                call.netrc(),
+                call.netrc().authenticators('api.juiceboxdata.com')
+            ]
         assert username is None
         assert token is None
 
@@ -172,19 +258,26 @@ machine git.heroku.com
                        mock_open(read_data=netrc_string),
                        create=True) as o_mock:
                 if os.name == 'nt':
-                    path_mock.expanduser.return_value = 'c:\\users\\some_user'
+                    path_mock.expanduser.return_value = self.windows_home_path
+                    path_mock.join.return_value = self.windows_netrc_file
                 jba = JuiceBoxAuthenticator(self.username, self.password)
                 jba.update_netrc()
                 assert call().readlines() in o_mock.mock_calls
                 assert call().writelines(output_lines) in o_mock.mock_calls
                 assert gnt_mock.mock_calls == [call()]
-                assert netrc_mock.mock_calls == [call.netrc()]
                 if os.name == 'nt':
+                    assert netrc_mock.mock_calls == [
+                        call.netrc(self.windows_netrc_file)
+                    ]
                     assert path_mock.mock_calls == [
+                        call.expanduser('~'),
+                        call.join('c:\\users\\some_user', '_netrc'),
                         call.expanduser('~/.netrc'),
                         call.expanduser('~'),
-                        call.join('c:\\users\\some_user', '_netrc')]
+                        call.join('c:\\users\\some_user', '_netrc')
+                    ]
                 else:
+                    assert netrc_mock.mock_calls == [call.netrc()]
                     assert path_mock.mock_calls == [
                         call.expanduser('~/.netrc')]
 
@@ -209,19 +302,26 @@ machine api.juiceboxdata.com
                        mock_open(read_data=netrc_string),
                        create=True) as o_mock:
                 if os.name == 'nt':
-                    path_mock.expanduser.return_value = 'c:\\users\\some_user'
+                    path_mock.expanduser.return_value = self.windows_home_path
+                    path_mock.join.return_value = self.windows_netrc_file
                 jba = JuiceBoxAuthenticator(self.username, self.password)
                 jba.update_netrc()
                 assert call().readlines() in o_mock.mock_calls
                 assert call().writelines(output_lines) in o_mock.mock_calls
                 assert gnt_mock.mock_calls == [call()]
-                assert netrc_mock.mock_calls == [call.netrc()]
 
                 if os.name == 'nt':
+                    assert netrc_mock.mock_calls == [
+                        call.netrc(self.windows_netrc_file)
+                    ]
                     assert path_mock.mock_calls == [
+                        call.expanduser('~'),
+                        call.join('c:\\users\\some_user', '_netrc'),
                         call.expanduser('~/.netrc'),
                         call.expanduser('~'),
-                        call.join('c:\\users\\some_user', '_netrc')]
+                        call.join('c:\\users\\some_user', '_netrc')
+                    ]
                 else:
+                    assert netrc_mock.mock_calls == [call.netrc()]
                     assert path_mock.mock_calls == [
                         call.expanduser('~/.netrc')]

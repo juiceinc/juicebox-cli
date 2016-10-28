@@ -24,6 +24,7 @@ class JuiceBoxAuthenticator:
                 logger.debug('Using user defined netrc_file %s',
                              netrc_location)
                 self.netrc_proxy = netrc.netrc(netrc_location)
+            elif os.name == 'nt':
                 logger.debug('Trying to use Windows _netrc')
                 home = os.path.expanduser('~')
                 netrc_file = os.path.join(home, '_netrc')
