@@ -35,7 +35,7 @@ If we are operating in an environment other than our normal production environme
 
     $ juice login --env dev user@domain.com
 
-The above command will authenticate us with the 'dev' environment.
+The above command will authenticate us with the 'dev' environment. You only need to repeat the login if you change your target environment, your password has changed, or your token has been invalidated.
 
 Listing Available Clients
 -------------------------
@@ -76,6 +76,10 @@ The upload command also accepts the ``--env flag``, as shown here::
 
     $ juice upload --env dev records.csv
 
-Finally, if we have access to multiple clients, we can use the ``--client`` option with a client identifier from the clients_list command to upload a file for a specific client. If you don't pass a client idea, it uses the lowest client identifier you have access too. Here is an example using the ``--client`` option::
+If we have access to multiple clients, we can use the ``--client`` option with a client identifier from the clients_list command to upload a file for a specific client. If you don't pass a client idea, it uses the lowest client identifier you have access too. Here is an example using the ``--client`` option::
 
     $ juice upload --env dev --client 1 records.csv
+
+Finally if we need to provide the location of the authentication file, we can use the ``--netrc`` option with the full path to the netrc file.  This can be useful for scheduled tasks on windows. The file is typically found in a users home directory and named .netrc on any POSIX operating system, and _netrc on any Windows system.  Here is an example from Windows::
+
+    > juice upload --netrc c:\users\etl\_netrc records.csv
