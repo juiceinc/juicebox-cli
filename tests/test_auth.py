@@ -1,4 +1,5 @@
 import json
+import os
 
 import pytest
 from mock import call, mock_open, patch, ANY
@@ -170,13 +171,20 @@ machine git.heroku.com
             with patch('juicebox_cli.auth.open',
                        mock_open(read_data=netrc_string),
                        create=True) as o_mock:
+                if os.name == 'nt':
+                    path_mock.expanduser.return_value = 'c:\\users\\some_user'
                 jba = JuiceBoxAuthenticator(self.username, self.password)
                 jba.update_netrc()
                 assert call().readlines() in o_mock.mock_calls
                 assert call().writelines(output_lines) in o_mock.mock_calls
                 assert gnt_mock.mock_calls == [call()]
                 assert netrc_mock.mock_calls == [call.netrc()]
-                assert path_mock.mock_calls == [call.expanduser('~/.netrc')]
+                if os.name == 'nt':
+                    assert path_mock.mock_calls == [call.expanduser('~/.netrc'),
+                                                    call.expanduser('~'),
+                                                    call.join('c:\\users\\some_user', '_netrc')]
+                else:
+                    assert path_mock.mock_calls == [call.expanduser('~/.netrc')]
 
     @patch('juicebox_cli.auth.os.path')
     @patch('juicebox_cli.auth.netrc')
@@ -198,10 +206,18 @@ machine api.juiceboxdata.com
             with patch('juicebox_cli.auth.open',
                        mock_open(read_data=netrc_string),
                        create=True) as o_mock:
+                if os.name == 'nt':
+                    path_mock.expanduser.return_value = 'c:\\users\\some_user'
                 jba = JuiceBoxAuthenticator(self.username, self.password)
                 jba.update_netrc()
                 assert call().readlines() in o_mock.mock_calls
                 assert call().writelines(output_lines) in o_mock.mock_calls
                 assert gnt_mock.mock_calls == [call()]
                 assert netrc_mock.mock_calls == [call.netrc()]
-                assert path_mock.mock_calls == [call.expanduser('~/.netrc')]
+
+                if os.name == 'nt':
+                    assert path_mock.mock_calls == [call.expanduser('~/.netrc'),
+                                                    call.expanduser('~'),
+                                                    call.join('c:\\users\\some_user', '_netrc')]
+                else:
+                    assert path_mock.mock_calls == [call.expanduser('~/.netrc')]
