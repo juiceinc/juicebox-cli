@@ -180,11 +180,13 @@ machine git.heroku.com
                 assert gnt_mock.mock_calls == [call()]
                 assert netrc_mock.mock_calls == [call.netrc()]
                 if os.name == 'nt':
-                    assert path_mock.mock_calls == [call.expanduser('~/.netrc'),
-                                                    call.expanduser('~'),
-                                                    call.join('c:\\users\\some_user', '_netrc')]
+                    assert path_mock.mock_calls == [
+                        call.expanduser('~/.netrc'),
+                        call.expanduser('~'),
+                        call.join('c:\\users\\some_user', '_netrc')]
                 else:
-                    assert path_mock.mock_calls == [call.expanduser('~/.netrc')]
+                    assert path_mock.mock_calls == [
+                        call.expanduser('~/.netrc')]
 
     @patch('juicebox_cli.auth.os.path')
     @patch('juicebox_cli.auth.netrc')
@@ -216,8 +218,10 @@ machine api.juiceboxdata.com
                 assert netrc_mock.mock_calls == [call.netrc()]
 
                 if os.name == 'nt':
-                    assert path_mock.mock_calls == [call.expanduser('~/.netrc'),
-                                                    call.expanduser('~'),
-                                                    call.join('c:\\users\\some_user', '_netrc')]
+                    assert path_mock.mock_calls == [
+                        call.expanduser('~/.netrc'),
+                        call.expanduser('~'),
+                        call.join('c:\\users\\some_user', '_netrc')]
                 else:
-                    assert path_mock.mock_calls == [call.expanduser('~/.netrc')]
+                    assert path_mock.mock_calls == [
+                        call.expanduser('~/.netrc')]
