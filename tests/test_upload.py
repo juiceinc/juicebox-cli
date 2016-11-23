@@ -1,6 +1,6 @@
 import json
 
-from mock import call, patch, ANY
+from mock import call, patch, ANY, mock_open
 import pytest
 
 from juicebox_cli.exceptions import AuthenticationError
@@ -119,20 +119,21 @@ class TestS3Uploader:
         files = ['cookies.txt', 'bad_cakes.zip']
         jba_mock.return_value.is_auth_preped.return_value = True
         with patch.object(S3Uploader, 'get_s3_upload_token') as token_mock:
-            token_mock.return_value = creds_dict
-            s3u = S3Uploader(files)
-            failures = s3u.upload()
+            with patch('__builtin__.open', mock_open(read_data='some\ndata')):
+                token_mock.return_value = creds_dict
+                s3u = S3Uploader(files)
+                failures = s3u.upload()
             assert boto_mock.mock_calls == [
                 call.client(
                     's3', aws_access_key_id='dis_key',
                     aws_secret_access_key='dat_secret',
                     aws_session_token='these_are_a_mile_long'),
                 call.client().put_object(
-                    ACL='bucket-owner-full-control', Body='cookies.txt',
+                    ACL='bucket-owner-full-control', Body=ANY,
                     Bucket='bucket',
                     Key=ANY, ServerSideEncryption='AES256'),
                 call.client().put_object(
-                    ACL='bucket-owner-full-control', Body='bad_cakes.zip',
+                    ACL='bucket-owner-full-control', Body=ANY,
                     Bucket='bucket',
                     Key=ANY, ServerSideEncryption='AES256')
             ]
@@ -163,20 +164,21 @@ class TestS3Uploader:
         boto_mock.client.return_value.put_object.side_effect = [None,
                                                                 ValueError]
         with patch.object(S3Uploader, 'get_s3_upload_token') as token_mock:
-            token_mock.return_value = creds_dict
-            s3u = S3Uploader(files)
-            failures = s3u.upload()
+            with patch('__builtin__.open', mock_open(read_data='some\ndata')):
+                token_mock.return_value = creds_dict
+                s3u = S3Uploader(files)
+                failures = s3u.upload()
             assert boto_mock.mock_calls == [
                 call.client(
                     's3', aws_access_key_id='dis_key',
                     aws_secret_access_key='dat_secret',
                     aws_session_token='these_are_a_mile_long'),
                 call.client().put_object(
-                    ACL='bucket-owner-full-control', Body='cookies.txt',
+                    ACL='bucket-owner-full-control', Body=ANY,
                     Bucket='bucket',
                     Key=ANY, ServerSideEncryption='AES256'),
                 call.client().put_object(
-                    ACL='bucket-owner-full-control', Body='bad_cakes.zip',
+                    ACL='bucket-owner-full-control', Body=ANY,
                     Bucket='bucket',
                     Key=ANY, ServerSideEncryption='AES256')
             ]

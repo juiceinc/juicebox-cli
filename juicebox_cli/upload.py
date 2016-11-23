@@ -94,21 +94,22 @@ class S3Uploader:
             elif upload_file.startswith('.'):
                 logger.debug('%s: is a hidden file, skipping', upload_file)
                 continue
-
+            filename = filename.replace('\\', '/')
             key = '{}/{}/{}'.format(client_id, generated_folder, filename)
-            try:
-                logger.debug('Uploading file: %s', upload_file)
-                client.put_object(
-                    ACL='bucket-owner-full-control',
-                    Body=upload_file,
-                    Bucket=bucket,
-                    Key=key,
-                    ServerSideEncryption='AES256'
-                )
-                logger.debug('Successfully uploaded: %s', upload_file)
-            except Exception as exc_info:
-                failed_files.append(upload_file)
-                logger.debug(exc_info)
+            with open(upload_file, 'rb') as upload_fileobject:
+                try:
+                    logger.debug('Uploading file: %s', upload_file)
+                    client.put_object(
+                        ACL='bucket-owner-full-control',
+                        Body=upload_fileobject,
+                        Bucket=bucket,
+                        Key=key,
+                        ServerSideEncryption='AES256'
+                    )
+                    logger.debug('Successfully uploaded: %s', upload_file)
+                except Exception as exc_info:
+                    failed_files.append(upload_file)
+                    logger.debug(exc_info)
 
         return failed_files
 
