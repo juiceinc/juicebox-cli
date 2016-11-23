@@ -1,4 +1,5 @@
 import json
+import sys
 
 from mock import call, patch, ANY, mock_open
 import pytest
@@ -6,6 +7,9 @@ import pytest
 from juicebox_cli.exceptions import AuthenticationError
 from juicebox_cli.upload import S3Uploader
 from tests.response import Response
+
+
+open_name = 'builtins.open' if sys.version_info >= (3,) else '__builtin__.open'
 
 
 class TestS3Uploader:
@@ -119,7 +123,7 @@ class TestS3Uploader:
         files = ['cookies.txt', 'bad_cakes.zip']
         jba_mock.return_value.is_auth_preped.return_value = True
         with patch.object(S3Uploader, 'get_s3_upload_token') as token_mock:
-            with patch('__builtin__.open', mock_open(read_data='some\ndata')):
+            with patch(open_name, mock_open(read_data='some\ndata')):
                 token_mock.return_value = creds_dict
                 s3u = S3Uploader(files)
                 failures = s3u.upload()
@@ -164,7 +168,7 @@ class TestS3Uploader:
         boto_mock.client.return_value.put_object.side_effect = [None,
                                                                 ValueError]
         with patch.object(S3Uploader, 'get_s3_upload_token') as token_mock:
-            with patch('__builtin__.open', mock_open(read_data='some\ndata')):
+            with patch(open_name, mock_open(read_data='some\ndata')):
                 token_mock.return_value = creds_dict
                 s3u = S3Uploader(files)
                 failures = s3u.upload()
