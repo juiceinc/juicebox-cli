@@ -147,6 +147,49 @@ class TestS3Uploader:
 
     @patch('juicebox_cli.upload.boto3')
     @patch('juicebox_cli.upload.JuiceBoxAuthenticator')
+    def test_upload_with_app(self, jba_mock, boto_mock):
+        creds_dict = {
+            'data': {
+                'attributes': {
+                    'access_key_id': 'dis_key',
+                    'secret_access_key': 'dat_secret',
+                    'session_token': 'these_are_a_mile_long',
+                    'bucket': 'bucket'
+                },
+                'relationships': {
+                    'clients': {
+                        'data': [{'id': 0}]
+                    }
+                }
+            }
+        }
+        files = ['cookies.txt', 'bad_cakes.zip']
+        jba_mock.return_value.is_auth_preped.return_value = True
+        with patch.object(S3Uploader, 'get_s3_upload_token') as token_mock:
+            with patch(open_name, mock_open(read_data='some\ndata')):
+                token_mock.return_value = creds_dict
+                s3u = S3Uploader(files)
+                failures = s3u.upload(app='cookies')
+            assert boto_mock.mock_calls == [
+                call.client(
+                    's3', aws_access_key_id='dis_key',
+                    aws_secret_access_key='dat_secret',
+                    aws_session_token='these_are_a_mile_long'),
+                call.client().put_object(
+                    ACL='bucket-owner-full-control', Body=ANY,
+                    Bucket='bucket',
+                    Key=ANY, ServerSideEncryption='AES256'),
+                call.client().put_object(
+                    ACL='bucket-owner-full-control', Body=ANY,
+                    Bucket='bucket',
+                    Key=ANY, ServerSideEncryption='AES256')
+            ]
+            assert jba_mock.mock_calls == [call(netrc_location=None),
+                                           call().is_auth_preped()]
+            assert not failures
+
+    @patch('juicebox_cli.upload.boto3')
+    @patch('juicebox_cli.upload.JuiceBoxAuthenticator')
     def test_upload_bad(self, jba_mock, boto_mock):
         creds_dict = {
             'data': {
