@@ -50,7 +50,7 @@ class S3Uploader:
         logger.debug('Successfully retrieved STS S3 Upload token')
         return credentials
 
-    def upload(self, client=None):
+    def upload(self, client=None, app=None):
         credentials = self.get_s3_upload_token(client)
 
         logger.debug('Initializing S3 client')
@@ -96,6 +96,9 @@ class S3Uploader:
                 continue
             filename = filename.replace('\\', '/')
             key = '{}/{}/{}'.format(client_id, generated_folder, filename)
+            if app:
+                key = '{}/{}/{}/{}'.format(client_id, app, generated_folder,
+                                           filename)
             with open(upload_file, 'rb') as upload_fileobject:
                 try:
                     logger.debug('Uploading file: %s', upload_file)
