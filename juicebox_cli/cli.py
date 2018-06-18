@@ -5,12 +5,13 @@ import logging
 import click
 import requests
 
-from juicebox_cli.auth import JuiceBoxAuthenticator
-from juicebox_cli.clients import JBClients
-from juicebox_cli.config import PUBLIC_API_URLS
-from juicebox_cli.exceptions import AuthenticationError
-from juicebox_cli.logger import logger
-from juicebox_cli.upload import S3Uploader
+from . import __version__
+from .auth import JuiceBoxAuthenticator
+from .clients import JBClients
+from .config import PUBLIC_API_URLS
+from .exceptions import AuthenticationError
+from .logger import logger
+from .upload import S3Uploader
 
 
 def validate_environment(ctx, env):
@@ -22,7 +23,7 @@ def validate_environment(ctx, env):
 
 
 @click.group()
-@click.version_option()
+@click.version_option(version=__version__)
 @click.option('--debug', default=False, help='Show detailed logging',
               is_flag=True)
 def cli(debug):
