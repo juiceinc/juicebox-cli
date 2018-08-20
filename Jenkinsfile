@@ -40,7 +40,14 @@ pip install -qq --exists-action w -r requirements-dev.txt
 '''
       }
     }
-
+    stage('Testing') {
+      steps {
+      sh '''
+#!/usr/bin/bash
+if [ "$BRANCH_NAME" = "master" ]; then . .venv/bin/activate; pytest --junit-xml=junit.xml --cov-branch --cov-report=xml --cov=juicebox_cli; fi;
+'''
+      }
+    }
     stage('Build Docs') {
       steps {
       sh '''
@@ -61,6 +68,10 @@ if [ "$BRANCH_NAME" = "master" ]; then . .venv/bin/activate; cd docs; aws s3 syn
   }
 post {
     always {
+      archiveArtifacts '**/flake8_errors.txt, **/junit.xml, **/coverage.xml'
+      warnings canComputeNew: false, canResolveRelativePaths: false, canRunOnFailed: true, categoriesPattern: '', defaultEncoding: '', excludePattern: '', healthy: '', includePattern: '', messagesPattern: '', parserConfigurations: [[parserName: 'Pep8', pattern: 'flake8_errors.txt']], unHealthy: ''
+      junit 'juicebox-cli/junit.xml'
+      step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: '**/coverage.xml', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false])
       sendNotifications(currentBuild.result, "$CHANNEL_NAME")
     }
   }
