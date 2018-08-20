@@ -9,7 +9,6 @@ def projectProperties = [
   [$class: 'RebuildSettings', autoRebuild: false, rebuildDisabled: false],
   parameters(
     [
-        string(      defaultValue: 'master',       description: 'The branch to target', name: 'BRANCH_NAME'),
         string(      defaultValue: CHANNEL_NAME,       description: 'The slack channel to use', name: 'CHANNEL_NAME'),
     ]
   ),
