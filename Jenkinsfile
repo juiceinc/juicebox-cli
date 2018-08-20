@@ -60,7 +60,7 @@ if [ "$BRANCH_NAME" = "master" ]; then . .venv/bin/activate; cd docs; make html;
       steps {
       sh '''
 #!/usr/bin/bash
-if [ "$BRANCH_NAME" = "master" ]; then . .venv/bin/activate; cd docs; aws s3 sync build/html s3://internal.juiceboxdata.com/projects/juicebox-cli --acl bucket-owner-full-control --delete; fi;
+if [ "$BRANCH_NAME" = "master" ]; then . .venv/bin/activate; cd docs; aws s3 sync build/html s3://internal.juiceboxdata.com/projects/juicebox-cli --acl bucket-owner-full-control --delete; aws s3 sync build/html s3://docs.juiceboxdata.com/projects/juicebox-cli --acl bucket-owner-full-control --delete; fi;
 
 '''
       }
