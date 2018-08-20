@@ -56,5 +56,3 @@ post {
     }
   }
 }
-GET | 302 | ? ms | GitHub.com
-GET | 200 | ? ms
