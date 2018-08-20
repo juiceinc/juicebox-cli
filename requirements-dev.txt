@@ -7,3 +7,4 @@ Sphinx==1.4.5
 tox==2.3.1
 tox-pyenv==1.0.2
 twine==1.8.1
+awscli==1.15.40
