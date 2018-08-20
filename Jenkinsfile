@@ -43,7 +43,8 @@ pip install -qq --exists-action w -r requirements-dev.txt
       steps {
       sh '''
 #!/usr/bin/bash
-if [ "$BRANCH_NAME" = "master" ]; then . .venv/bin/activate; pytest --junit-xml=junit.xml --cov-branch --cov-report=xml --cov=juicebox_cli; fi;
+. .venv/bin/activate
+pytest --junit-xml=junit.xml --cov-branch --cov-report=xml --cov=juicebox_cli
 '''
       }
     }
