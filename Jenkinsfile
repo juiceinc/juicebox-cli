@@ -49,6 +49,15 @@ if [ "$BRANCH_NAME" = "master" ]; then . .venv/bin/activate; cd docs; make html;
 '''
       }
     }
+    stage('Publish Docs') {
+      steps {
+      sh '''
+#!/usr/bin/bash
+if [ "$BRANCH_NAME" = "master" ]; then . .venv/bin/activate; aws s3 sync build/html s3://internal.juiceboxdata.com/projects/juicebox-cli --acl bucket-owner-full-control --delete
+
+'''
+      }
+    }
   }
 post {
     always {
