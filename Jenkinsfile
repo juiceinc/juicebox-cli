@@ -70,7 +70,7 @@ post {
     always {
       archiveArtifacts '**/flake8_errors.txt, **/junit.xml, **/coverage.xml'
       warnings canComputeNew: false, canResolveRelativePaths: false, canRunOnFailed: true, categoriesPattern: '', defaultEncoding: '', excludePattern: '', healthy: '', includePattern: '', messagesPattern: '', parserConfigurations: [[parserName: 'Pep8', pattern: 'flake8_errors.txt']], unHealthy: ''
-      junit 'juicebox-cli/junit.xml'
+      junit 'junit.xml'
       step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: '**/coverage.xml', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false])
       sendNotifications(currentBuild.result, "$CHANNEL_NAME")
     }
