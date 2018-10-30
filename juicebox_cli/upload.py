@@ -46,6 +46,9 @@ class S3Uploader:
         elif response.status_code == 409:
             logger.debug(response)
             raise ValueError(response.json()['error'])
+        elif response.status_code != 200:
+            logger.debug(response)
+            raise Exception("Couldn't get an S3 upload token.")
         credentials = response.json()
         logger.debug('Successfully retrieved STS S3 Upload token')
         return credentials
