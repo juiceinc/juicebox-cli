@@ -87,7 +87,7 @@ def upload(ctx, client, env, app, job, netrc, files):
         logger.debug(message)
         click.echo(click.style(message, fg='red'))
         ctx.abort()
-    except AuthenticationError as exc_info:
+    except Exception as exc_info:
         click.echo(click.style(str(exc_info), fg='red'))
         ctx.abort()
 
