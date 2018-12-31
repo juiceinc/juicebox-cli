@@ -8,14 +8,16 @@ import requests
 from . import __version__
 from .auth import JuiceBoxAuthenticator
 from .clients import JBClients
-from .config import PUBLIC_API_URLS
+from . import config
 from .exceptions import AuthenticationError
 from .logger import logger
 from .upload import S3Uploader
 
 
 def validate_environment(ctx, env):
-    if env not in PUBLIC_API_URLS:
+    try:
+        config.get_public_api(env)
+    except Exception as e:
         message = 'The supplied environment is not valid. Please choose ' \
                   'from: {}.'.format(', '.join(PUBLIC_API_URLS.keys()))
         click.echo(click.style(message, fg='red'))
@@ -26,11 +28,13 @@ def validate_environment(ctx, env):
 @click.version_option(version=__version__)
 @click.option('--debug', default=False, help='Show detailed logging',
               is_flag=True)
-def cli(debug):
+@click.option('--api', help='Override the API server to connect to')
+def cli(debug, api):
     """ Juicebox CLI app """
     if debug:
         logger.setLevel(logging.DEBUG)
-
+    if api:
+        config.CUSTOM_URL = api
 
 @cli.command()
 @click.argument('username')
