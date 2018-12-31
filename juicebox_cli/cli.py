@@ -17,9 +17,9 @@ from .upload import S3Uploader
 def validate_environment(ctx, env):
     try:
         config.get_public_api(env)
-    except Exception as e:
+    except Exception:
         message = 'The supplied environment is not valid. Please choose ' \
-                  'from: {}.'.format(', '.join(PUBLIC_API_URLS.keys()))
+                  'from: {}.'.format(', '.join(config.PUBLIC_API_URLS.keys()))
         click.echo(click.style(message, fg='red'))
         ctx.abort()
 
