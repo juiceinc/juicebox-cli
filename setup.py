@@ -12,9 +12,9 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 requirements = [
-    'boto3==1.4.0',
+    'boto3==1.7.80',
     'certifi==2016.8.8',
-    'click==6.6',
+    'click==7.0',
     'requests==2.11.0'
 ]
 
