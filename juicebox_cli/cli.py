@@ -28,7 +28,7 @@ def validate_environment(ctx, env):
 @click.version_option(version=__version__)
 @click.option('--debug', default=False, help='Show detailed logging',
               is_flag=True)
-@click.option('--api', help='Override the API server to connect to')
+@click.option('--api', hidden=True, help='Override the API server to connect to')
 def cli(debug, api):
     """ Juicebox CLI app """
     if debug:
