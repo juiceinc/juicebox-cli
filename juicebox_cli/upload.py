@@ -7,7 +7,7 @@ import uuid
 import boto3
 
 from juicebox_cli.auth import JuiceBoxAuthenticator
-from juicebox_cli.config import PUBLIC_API_URLS
+from juicebox_cli.config import get_public_api
 from juicebox_cli.exceptions import AuthenticationError
 from juicebox_cli.logger import logger
 from juicebox_cli.jb_requests import jb_requests
@@ -25,7 +25,7 @@ class S3Uploader:
 
     def get_s3_upload_token(self, client=None):
         logger.debug('Getting STS S3 Upload token')
-        url = '{}/upload-token/'.format(PUBLIC_API_URLS[self.env])
+        url = '{}/upload-token/'.format(get_public_api(self.env))
         data = {
             'data': {
                 'attributes': {

@@ -1,7 +1,7 @@
 """JB Clients commands
 """
 from juicebox_cli.auth import JuiceBoxAuthenticator
-from juicebox_cli.config import PUBLIC_API_URLS
+from juicebox_cli.config import get_public_api
 from juicebox_cli.exceptions import AuthenticationError
 from juicebox_cli.logger import logger
 from juicebox_cli.jb_requests import jb_requests
@@ -18,7 +18,7 @@ class JBClients:
 
     def get_simple_client_list(self):
         logger.debug('Getting Clients list')
-        url = '{}/clients/?env={}'.format(PUBLIC_API_URLS[self.env], self.env)
+        url = '{}/clients/?env={}'.format(get_public_api(self.env), self.env)
 
         headers = {'content-type': 'application/json',
                    'Authorization': 'Token {}'.format(self.jb_auth.token)}
