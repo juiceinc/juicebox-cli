@@ -104,11 +104,7 @@ def upload(ctx, client, env, app, job, netrc, files):
     logger.debug('upload successful')
     click.echo(click.style('Successfully Uploaded', fg='green'))
 
-
-@cli.command()
-@click.option('--env', envvar='JB_ENV', default='prod')
-@click.pass_context
-def clients_list(ctx, env):
+def _clients_list(ctx, env):
     validate_environment(ctx, env)
     try:
         jb_clients = JBClients(env)
@@ -125,3 +121,17 @@ def clients_list(ctx, env):
     click.echo('--------------  -------------------------------------')
     for client_id, client_name in sorted(clients.items()):
         click.echo('{:14}  {}'.format(client_id, client_name))
+
+
+@cli.command(name='clients_list')
+@click.option('--env', envvar='JB_ENV', default='prod')
+@click.pass_context
+def clients_list(ctx, env):
+    return _clients_list(ctx, env)
+
+
+@cli.command(name='clients-list')
+@click.option('--env', envvar='JB_ENV', default='prod')
+@click.pass_context
+def _clients_dash_list(ctx, env):
+    return _clients_list(ctx, env)
