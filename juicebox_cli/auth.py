@@ -5,7 +5,7 @@ import netrc
 import os
 import stat
 
-from juicebox_cli.config import PUBLIC_API_URLS, NETRC_HOST_NAME
+from juicebox_cli.config import get_public_api, NETRC_HOST_NAME
 from juicebox_cli.exceptions import AuthenticationError
 from juicebox_cli.logger import logger
 from juicebox_cli.jb_requests import jb_requests
@@ -68,7 +68,7 @@ class JuiceBoxAuthenticator:
         :type save: bool
         """
         logger.debug('Getting JB token from Public API')
-        url = '{}/token/'.format(PUBLIC_API_URLS[self.env])
+        url = '{}/token/'.format(get_public_api(self.env))
         data = {
             'data': {
                 'attributes': {

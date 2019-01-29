@@ -8,16 +8,18 @@ import requests
 from . import __version__
 from .auth import JuiceBoxAuthenticator
 from .clients import JBClients
-from .config import PUBLIC_API_URLS
+from . import config
 from .exceptions import AuthenticationError
 from .logger import logger
 from .upload import S3Uploader
 
 
 def validate_environment(ctx, env):
-    if env not in PUBLIC_API_URLS:
+    try:
+        config.get_public_api(env)
+    except Exception:
         message = 'The supplied environment is not valid. Please choose ' \
-                  'from: {}.'.format(', '.join(PUBLIC_API_URLS.keys()))
+                  'from: {}.'.format(', '.join(config.PUBLIC_API_URLS.keys()))
         click.echo(click.style(message, fg='red'))
         ctx.abort()
 
@@ -26,11 +28,13 @@ def validate_environment(ctx, env):
 @click.version_option(version=__version__)
 @click.option('--debug', default=False, help='Show detailed logging',
               is_flag=True)
-def cli(debug):
+@click.option('--api', hidden=True, help='Override the API server to connect to')
+def cli(debug, api):
     """ Juicebox CLI app """
     if debug:
         logger.setLevel(logging.DEBUG)
-
+    if api:
+        config.CUSTOM_URL = api
 
 @cli.command()
 @click.argument('username')
@@ -100,11 +104,7 @@ def upload(ctx, client, env, app, job, netrc, files):
     logger.debug('upload successful')
     click.echo(click.style('Successfully Uploaded', fg='green'))
 
-
-@cli.command()
-@click.option('--env', envvar='JB_ENV', default='prod')
-@click.pass_context
-def clients_list(ctx, env):
+def _clients_list(ctx, env):
     validate_environment(ctx, env)
     try:
         jb_clients = JBClients(env)
@@ -121,3 +121,17 @@ def clients_list(ctx, env):
     click.echo('--------------  -------------------------------------')
     for client_id, client_name in sorted(clients.items()):
         click.echo('{:14}  {}'.format(client_id, client_name))
+
+
+@cli.command(name='clients_list')
+@click.option('--env', envvar='JB_ENV', default='prod')
+@click.pass_context
+def clients_list(ctx, env):
+    return _clients_list(ctx, env)
+
+
+@cli.command(name='clients-list')
+@click.option('--env', envvar='JB_ENV', default='prod')
+@click.pass_context
+def _clients_dash_list(ctx, env):
+    return _clients_list(ctx, env)
