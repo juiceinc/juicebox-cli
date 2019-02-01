@@ -27,9 +27,9 @@ class TestCLI:
     def test_login_command(self, prompt_mock, jba_mock):
         prompt_mock.return_value = 'cookie'
         runner = CliRunner()
-        result = runner.invoke(cli, ['login', 'chris@juice.com'])
+        result = runner.invoke(cli, ['login', 'chris@juice.com', '--endpoint', 'http://localhost:8000'])
         assert jba_mock.mock_calls == [call('chris@juice.com', 'cookie',
-                                            'prod'),
+                                            'http://localhost:8000'),
                                        call().get_juicebox_token(save=True)]
         assert 'Successfully Authenticated!' in result.output
         assert result.exit_code == 0
@@ -41,9 +41,9 @@ class TestCLI:
         prompt_mock.return_value = 'cookie'
         runner = CliRunner()
         result = runner.invoke(cli, ['--debug', 'login',
-                                     'chris@juice.com'])
+                                     'chris@juice.com', '--endpoint', 'http://localhost:8000'])
         assert jba_mock.mock_calls == [call('chris@juice.com', 'cookie',
-                                            'prod'),
+                                            'http://localhost:8000'),
                                        call().get_juicebox_token(
                                            save=True)]
         assert 'Successfully Authenticated!' in result.output
@@ -57,9 +57,9 @@ class TestCLI:
         jba_mock.return_value.get_juicebox_token.side_effect = \
             AuthenticationError('Bad Login')
         runner = CliRunner()
-        result = runner.invoke(cli, ['login', 'chris@juice.com'])
+        result = runner.invoke(cli, ['login', 'chris@juice.com', '--endpoint', 'http://localhost:8000'])
         assert jba_mock.mock_calls == [call('chris@juice.com', 'cookie',
-                                            'prod'),
+                                            'http://localhost:8000'),
                                        call().get_juicebox_token(
                                            save=True)]
         assert 'Bad Login' in result.output
@@ -72,9 +72,9 @@ class TestCLI:
         jba_mock.return_value.get_juicebox_token.side_effect = \
             requests.ConnectionError('Boom!')
         runner = CliRunner()
-        result = runner.invoke(cli, ['login', 'chris@juice.com'])
+        result = runner.invoke(cli, ['login', 'chris@juice.com', '--endpoint', 'http://localhost:8000'])
         assert jba_mock.mock_calls == [call('chris@juice.com', 'cookie',
-                                            'prod'),
+                                            'http://localhost:8000'),
                                        call().get_juicebox_token(
                                            save=True)]
         assert 'Failed to connect to public API' in result.output

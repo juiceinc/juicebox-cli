@@ -38,14 +38,13 @@ def cli(debug, api):
 
 @cli.command()
 @click.argument('username')
-@click.option('--env', envvar='JB_ENV', default='prod')
+@click.option('--endpoint', required=True)
 @click.pass_context
-def login(ctx, username, env):
-    validate_environment(ctx, env)
+def login(ctx, username, endpoint):
     logger.debug('Attempting login for %s', username)
     password = click.prompt('Password', type=str, hide_input=True)
 
-    jb_auth = JuiceBoxAuthenticator(username, password, env)
+    jb_auth = JuiceBoxAuthenticator(username, password, endpoint)
     try:
         jb_auth.get_juicebox_token(save=True)
     except AuthenticationError as exc_info:

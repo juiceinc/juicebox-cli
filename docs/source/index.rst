@@ -25,17 +25,17 @@ Occasionally, we release new versions of the juicebox-cli with an expanded featu
 Getting Started by Logging In
 -----------------------------
 
-After juicebox-cli has been installed, the juice command will be available. To begin using the CLI, we need to start by logging into Juicebox. Run the following command in your terminal replacing user@domain.com with the email of your Juicebox account::
+After juicebox-cli has been installed, the juice command will be available. To begin using the CLI, we need to start by logging into Juicebox. Run the following command in your terminal replacing user@domain.com with the email of your Juicebox account and https://mydomain.juiceboxdata.com with the url of your production Juicebox account::
 
-    $ juice login user@domain.com
+    $ juice login user@domain.com --endpoint https://mydomain.juiceboxdata.com
 
 After typing this in, we will be prompted for our Juicebox account password. (Note: the account used must be a Juicebox client admin account. Contact Juicebox support if you need help obtaining a client admin account.)
 
-If we are operating in an environment other than our normal production environment, we need to supply the environment name to the login command via the ``--env`` option::
+If we are operating in an environment other than our normal production environment, we need to provide the corresponding environment's url via the ``--endpoint`` option::
 
-    $ juice login --env dev user@domain.com
+    $ juice login user@domain.com --endpoint https://mydomain-dev.juiceboxdata.com
 
-The above command will authenticate us with the 'dev' environment. You only need to repeat the login if you change your target environment, your password has changed, or your token has been invalidated.
+The above command will authenticate us with the 'dev' environment. You only need to repeat the login if you change your target endpoint, your password has changed, or your token has been invalidated.
 
 Listing Available Clients
 -------------------------
