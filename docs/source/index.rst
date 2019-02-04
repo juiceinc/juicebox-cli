@@ -58,32 +58,28 @@ This command also accepts the ``--env`` flag, as shown here::
 Uploading Files
 ---------------
 
-To upload files for use in ETL or User account creation, we use the upload command. The upload command accepts multiple arguments that can be file or directory names. If a directory is supplied, it will upload all the files in the directory. Let's look at some examples:
+To upload files for use in ETL or User account creation, we use the upload command. The upload command accepts multiple arguments that can be file or directory names. If a directory is supplied, it will upload all the files in the directory. You will need to specify the endpoint of your Juicebox account. Let's look at some examples:
 
-In its simplest from it only requires a filename, as shown here::
+In its simplest form it only requires a filename, as shown here::
 
-    $ juice upload records.csv
+    $ juice upload records.csv --endpoint https://mydomain.juiceboxdata.com
 
 If we wanted to upload multiple files, we could do the following::
 
-    $ juice upload records.csv clients.csv more_data.csv
+    $ juice upload records.csv clients.csv more_data.csv --endpoint https://mydomain.juiceboxdata.com
 
 If we wanted to upload all the files in the data directory we would issue the following command::
 
-    $ juice upload data
-
-The upload command also accepts the ``--env flag``, as shown here::
-
-    $ juice upload --env dev records.csv
+    $ juice upload data --endpoint https://mydomain.juiceboxdata.com
 
 If we have access to multiple clients, we can use the ``--client`` option with a client identifier from the clients_list command to upload a file for a specific client. If you don't pass a client idea, it uses the lowest client identifier you have access too. Here is an example using the ``--client`` option::
 
-    $ juice upload --env dev --client 1 records.csv
+    $ juice upload --endpoint https://mydomain.juiceboxdata.com --client 1 records.csv
 
 Also if we have access to multiple apps, we can use the ``--app`` option with an app slug upload a file for a specific app. If you don't pass an app, it uses just the client folder you have access too. Here is an example using the ``--app`` option::
 
-    $ juice upload --env dev --client 1 --app data records.csv
+    $ juice upload --endpoint https://mydomain.juiceboxdata.com --client 1 --app data records.csv
 
 Finally if we need to provide the location of the authentication file, we can use the ``--netrc`` option with the full path to the netrc file.  This can be useful for scheduled tasks on windows. The file is typically found in a users home directory and named .netrc on any POSIX operating system, and _netrc on any Windows system.  Here is an example from Windows::
 
-    > juice upload --netrc c:\users\etl\_netrc records.csv
+    > juice upload --netrc c:\users\etl\_netrc records.csv --endpoint https://mydomain.juiceboxdata.com

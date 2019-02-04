@@ -50,7 +50,7 @@ class TestS3Uploader:
         req_mock.post.return_value = Response(200, {'data': {
             'attributes': credentials}})
         files = ['cookies.txt', 'bad_cakes.zip']
-        s3u = S3Uploader(files)
+        s3u = S3Uploader(files, 'http://localhost:8000')
         results = s3u.get_s3_upload_token()
         assert results == {'data': {'attributes': credentials}}
         assert jba_mock.mock_calls == [call(netrc_location=None),
@@ -66,7 +66,7 @@ class TestS3Uploader:
                     'token': 'cookies',
                     'username': 'chris@juice.com',
                     'client': None,
-                    'env': 'prod'
+                    'endpoint': 'http://localhost:8000'
                 },
                 'type': 'jbtoken'
             }
