@@ -14,16 +14,6 @@ from .logger import logger
 from .upload import S3Uploader
 
 
-def validate_environment(ctx, env):
-    try:
-        config.get_public_api(env)
-    except Exception:
-        message = 'The supplied environment is not valid. Please choose ' \
-                  'from: {}.'.format(', '.join(config.PUBLIC_API_URLS.keys()))
-        click.echo(click.style(message, fg='red'))
-        ctx.abort()
-
-
 @click.group()
 @click.version_option(version=__version__)
 @click.option('--debug', default=False, help='Show detailed logging',
