@@ -157,8 +157,8 @@ class TestCLI:
         clients = {'1': 'cookies', '2': 'pie'}
         jbc_mock.return_value.get_simple_client_list.return_value = clients
         runner = CliRunner()
-        result = runner.invoke(cli, ['clients_list', ])
-        assert jbc_mock.mock_calls == [call('prod'),
+        result = runner.invoke(cli, ['clients_list', '--endpoint', 'http://localhost:8000'])
+        assert jbc_mock.mock_calls == [call('http://localhost:8000'),
                                        call().get_simple_client_list()]
         for client_id, name in clients.items():
             assert client_id in result.output
@@ -169,8 +169,8 @@ class TestCLI:
     def test_clients_command_auth_failed(self, jbc_mock):
         jbc_mock.side_effect = AuthenticationError('Bad Login')
         runner = CliRunner()
-        result = runner.invoke(cli, ['clients_list', ])
-        assert jbc_mock.mock_calls == [call('prod'), ]
+        result = runner.invoke(cli, ['clients_list', '--endpoint', 'http://localhost:8000'])
+        assert jbc_mock.mock_calls == [call('http://localhost:8000'), ]
         assert 'Bad Login' in result.output
         assert result.exit_code == 1
 
@@ -179,8 +179,8 @@ class TestCLI:
         jbc_mock.return_value.get_simple_client_list.side_effect = \
             requests.ConnectionError('Boom!')
         runner = CliRunner()
-        result = runner.invoke(cli, ['clients_list', ])
-        assert jbc_mock.mock_calls == [call('prod'),
+        result = runner.invoke(cli, ['clients_list', '--endpoint', 'http://localhost:8000'])
+        assert jbc_mock.mock_calls == [call('http://localhost:8000'),
                                        call().get_simple_client_list()]
         assert 'Failed to connect to public API' in result.output
         assert result.exit_code == 1

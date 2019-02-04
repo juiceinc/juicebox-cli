@@ -8,8 +8,8 @@ from juicebox_cli.jb_requests import jb_requests
 
 
 class JBClients:
-    def __init__(self, env='prod'):
-        self.env = env
+    def __init__(self, endpoint=None):
+        self.endpoint = endpoint
         logger.debug('Initializing Clients Handler')
         self.jb_auth = JuiceBoxAuthenticator()
         if not self.jb_auth.is_auth_preped():
@@ -18,7 +18,7 @@ class JBClients:
 
     def get_simple_client_list(self):
         logger.debug('Getting Clients list')
-        url = '{}/clients/?env={}'.format(get_public_api(self.env), self.env)
+        url = '{}/clients/?endpoint={}'.format(get_public_api(), self.endpoint)
 
         headers = {'content-type': 'application/json',
                    'Authorization': 'Token {}'.format(self.jb_auth.token)}

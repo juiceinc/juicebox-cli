@@ -102,10 +102,9 @@ def upload(ctx, client, endpoint, app, job, netrc, files):
     logger.debug('upload successful')
     click.echo(click.style('Successfully Uploaded', fg='green'))
 
-def _clients_list(ctx, env):
-    validate_environment(ctx, env)
+def _clients_list(ctx, endpoint):
     try:
-        jb_clients = JBClients(env)
+        jb_clients = JBClients(endpoint)
         clients = jb_clients.get_simple_client_list()
     except AuthenticationError as exc_info:
         click.echo(click.style(str(exc_info), fg='red'))
@@ -122,14 +121,14 @@ def _clients_list(ctx, env):
 
 
 @cli.command(name='clients_list')
-@click.option('--env', envvar='JB_ENV', default='prod')
+@click.option('--endpoint', required=True)
 @click.pass_context
-def clients_list(ctx, env):
-    return _clients_list(ctx, env)
+def clients_list(ctx, endpoint):
+    return _clients_list(ctx, endpoint)
 
 
 @cli.command(name='clients-list')
-@click.option('--env', envvar='JB_ENV', default='prod')
+@click.option('--endpoint', required=True)
 @click.pass_context
-def _clients_dash_list(ctx, env):
-    return _clients_list(ctx, env)
+def _clients_dash_list(ctx, endpoint):
+    return _clients_list(ctx, endpoint)

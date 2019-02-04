@@ -40,13 +40,13 @@ class TestJBClients:
                      {'id': 2, 'attributes': {'name': 'brookies'}}]
         }
         req_mock.get.return_value = Response(200, clients)
-        jbc = JBClients()
+        jbc = JBClients(endpoint='http://localhost:8000')
         results = jbc.get_simple_client_list()
         assert call() in jba_mock.mock_calls
         assert call().is_auth_preped() in jba_mock.mock_calls
         assert expected_results == results
         assert req_mock.mock_calls == [
-            call.get('https://api.juiceboxdata.com/clients/?env=prod',
+            call.get('https://api.juiceboxdata.com/clients/?endpoint=http://localhost:8000',
                      headers={'content-type': 'application/json',
                               'Authorization': ANY})
         ]
