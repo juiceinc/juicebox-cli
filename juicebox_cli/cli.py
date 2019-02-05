@@ -7,7 +7,6 @@ import requests
 
 from . import __version__
 from .auth import JuiceBoxAuthenticator
-from .clients import JBClients
 from . import config
 from .exceptions import AuthenticationError
 from .logger import logger
@@ -90,34 +89,3 @@ def upload(ctx, endpoint, app, job, netrc, files):
 
     logger.debug('upload successful')
     click.echo(click.style('Successfully Uploaded', fg='green'))
-
-def _clients_list(ctx, endpoint):
-    try:
-        jb_clients = JBClients(endpoint)
-        clients = jb_clients.get_simple_client_list()
-    except AuthenticationError as exc_info:
-        click.echo(click.style(str(exc_info), fg='red'))
-        ctx.abort()
-    except requests.ConnectionError:
-        message = 'Failed to connect to public API'
-        logger.debug(message)
-        click.echo(click.style(message, fg='red'))
-        ctx.abort()
-    click.echo('Client ID       Client Name')
-    click.echo('--------------  -------------------------------------')
-    for client_id, client_name in sorted(clients.items()):
-        click.echo('{:14}  {}'.format(client_id, client_name))
-
-
-@cli.command(name='clients_list')
-@click.option('--endpoint', required=True)
-@click.pass_context
-def clients_list(ctx, endpoint):
-    return _clients_list(ctx, endpoint)
-
-
-@cli.command(name='clients-list')
-@click.option('--endpoint', required=True)
-@click.pass_context
-def _clients_dash_list(ctx, endpoint):
-    return _clients_list(ctx, endpoint)

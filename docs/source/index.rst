@@ -37,17 +37,6 @@ If we are operating in an environment other than our normal production environme
 
 The above command will authenticate us with the 'dev' environment. You only need to repeat the login if you change your target endpoint, your password has changed, or your token has been invalidated.
 
-Listing Available Clients
--------------------------
-
-If we need a list of all the clients available for our account, we can use the client_list command to print out a display of them. We need to supply the url of our Juicebox account using the ``--endpoint`` option. For example::
-
-
-    $ juice clients_list --endpoint https://mydomain.juiceboxdata.com
-    Client ID       Client Name
-    --------------  -------------------------------------
-    1               Juicebox
-
 Uploading Files
 ---------------
 
