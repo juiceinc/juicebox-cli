@@ -57,9 +57,8 @@ def login(ctx, username, endpoint):
 @click.option('--job')
 @click.option('--app', default=None)
 @click.option('--endpoint', required=True)
-@click.option('--client', default=None)
 @click.pass_context
-def upload(ctx, client, endpoint, app, job, netrc, files):
+def upload(ctx, endpoint, app, job, netrc, files):
     logger.debug('Starting upload for %s - %s: %s', endpoint, job, files)
     if not files:
         logger.debug('No files to upload')
@@ -73,7 +72,7 @@ def upload(ctx, client, endpoint, app, job, netrc, files):
 
     failed_files = None
     try:
-        failed_files = s3_uploader.upload(client, app)
+        failed_files = s3_uploader.upload(app)
     except requests.ConnectionError:
         message = 'Failed to connect to public API'
         logger.debug(message)

@@ -65,13 +65,9 @@ If we wanted to upload all the files in the data directory we would issue the fo
 
     $ juice upload data --endpoint https://mydomain.juiceboxdata.com
 
-If we have access to multiple clients, we can use the ``--client`` option with a client identifier from the clients_list command to upload a file for a specific client. If you don't pass a client idea, it uses the lowest client identifier you have access too. Here is an example using the ``--client`` option::
+If we have access to multiple apps, we can use the ``--app`` option with an app slug upload a file for a specific app. If you don't pass an app, it uses just the client folder you have access to. Here is an example using the ``--app`` option::
 
-    $ juice upload --endpoint https://mydomain.juiceboxdata.com --client 1 records.csv
-
-Also if we have access to multiple apps, we can use the ``--app`` option with an app slug upload a file for a specific app. If you don't pass an app, it uses just the client folder you have access too. Here is an example using the ``--app`` option::
-
-    $ juice upload --endpoint https://mydomain.juiceboxdata.com --client 1 --app data records.csv
+    $ juice upload --endpoint https://mydomain.juiceboxdata.com --app data records.csv
 
 Finally if we need to provide the location of the authentication file, we can use the ``--netrc`` option with the full path to the netrc file.  This can be useful for scheduled tasks on windows. The file is typically found in a users home directory and named .netrc on any POSIX operating system, and _netrc on any Windows system.  Here is an example from Windows::
 

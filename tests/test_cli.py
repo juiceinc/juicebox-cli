@@ -94,7 +94,7 @@ class TestCLI:
         runner = CliRunner()
         result = runner.invoke(cli, ['upload', 'setup.py', '--endpoint', 'http://localhost:8000'])
         assert s3u_mock.mock_calls == [call(('setup.py',), 'http://localhost:8000', None),
-                                       call().upload(None, None)]
+                                       call().upload(None)]
         assert 'Successfully Uploaded' in result.output
         assert result.exit_code == 0
 
@@ -104,7 +104,7 @@ class TestCLI:
         runner = CliRunner()
         result = runner.invoke(cli, ['upload', 'setup.py', '--app', 'cookies', '--endpoint', 'http://localhost:8000'])
         assert s3u_mock.mock_calls == [call(('setup.py',), 'http://localhost:8000', None),
-                                       call().upload(None, 'cookies')]
+                                       call().upload('cookies')]
         assert 'Successfully Uploaded' in result.output
         assert result.exit_code == 0
 
@@ -115,7 +115,7 @@ class TestCLI:
         result = runner.invoke(cli, ['upload', 'setup.py', 'setup.cfg', '--endpoint', 'http://localhost:8000'])
         assert s3u_mock.mock_calls == [call(('setup.py', 'setup.cfg'), 'http://localhost:8000',
                                             None),
-                                       call().upload(None, None)]
+                                       call().upload(None)]
         assert 'Successfully Uploaded' in result.output
         assert result.exit_code == 0
 
@@ -126,7 +126,7 @@ class TestCLI:
         result = runner.invoke(cli, ['upload', 'setup.py', 'setup.cfg', '--endpoint', 'http://localhost:8000'])
         assert s3u_mock.mock_calls == [call(('setup.py', 'setup.cfg'), 'http://localhost:8000',
                                             None),
-                                       call().upload(None, None)]
+                                       call().upload(None)]
         assert 'Failed to upload setup.py' in result.output
         assert result.exit_code == 1
 
@@ -148,7 +148,7 @@ class TestCLI:
         result = runner.invoke(cli, ['upload', 'setup.py', 'setup.cfg', '--endpoint', 'http://localhost:8000'])
         assert s3u_mock.mock_calls == [call(('setup.py', 'setup.cfg'), 'http://localhost:8000',
                                             None),
-                                       call().upload(None, None)]
+                                       call().upload(None)]
         assert 'Failed to connect to public API' in result.output
         assert result.exit_code == 1
 

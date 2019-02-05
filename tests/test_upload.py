@@ -65,7 +65,6 @@ class TestS3Uploader:
                 'attributes': {
                     'token': 'cookies',
                     'username': 'chris@juice.com',
-                    'client': None,
                     'endpoint': 'http://localhost:8000'
                 },
                 'type': 'jbtoken'
