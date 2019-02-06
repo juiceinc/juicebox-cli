@@ -27,7 +27,7 @@ def cli(debug, api):
 
 @cli.command()
 @click.argument('username')
-@click.option('--endpoint', required=True)
+@click.option('--endpoint', envvar='JB_ENDPOINT', required=True)
 @click.pass_context
 def login(ctx, username, endpoint):
     logger.debug('Attempting login for %s', username)
@@ -55,7 +55,7 @@ def login(ctx, username, endpoint):
 @click.option('--netrc', default=None)
 @click.option('--job')
 @click.option('--app', default=None)
-@click.option('--endpoint', required=True)
+@click.option('--endpoint', envvar='JB_ENDPOINT', required=True)
 @click.pass_context
 def upload(ctx, endpoint, app, job, netrc, files):
     logger.debug('Starting upload for %s - %s: %s', endpoint, job, files)
