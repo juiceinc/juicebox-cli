@@ -11,6 +11,7 @@ from tests.response import Response
 class TestJuiceBoxAuthenticator:
     username = 'cookie monster'
     password = 'cIsForCookie'
+    endpoint = 'http://localhost:8000'
     windows_home_path = 'c:\\users\\some_user'
     windows_netrc_file = 'c:\\users\\some_user\_netrc'
 
@@ -102,7 +103,7 @@ class TestJuiceBoxAuthenticator:
                 }
             }
         })
-        jba = JuiceBoxAuthenticator(self.username, self.password)
+        jba = JuiceBoxAuthenticator(self.username, self.password, self.endpoint)
         jba.get_juicebox_token()
         assert jba.token == 'dis_token'
         assert req_mock.mock_calls == [
@@ -113,8 +114,9 @@ class TestJuiceBoxAuthenticator:
         data_dict = {
             'data': {
                 'attributes': {
-                    'password': self.password, 'username': self.username,
-                    'env': 'prod'
+                    'password': self.password,
+                    'username': self.username,
+                    'endpoint': self.endpoint
                 },
                 'type': 'auth'
             }
@@ -144,7 +146,7 @@ class TestJuiceBoxAuthenticator:
         })
         with patch.object(JuiceBoxAuthenticator, 'update_netrc',
                           return_value=None) as update_mock:
-            jba = JuiceBoxAuthenticator(self.username, self.password)
+            jba = JuiceBoxAuthenticator(self.username, self.password, self.endpoint)
             jba.get_juicebox_token(save=True)
             assert jba.token == 'dis_token'
             assert req_mock.mock_calls == [
@@ -155,8 +157,9 @@ class TestJuiceBoxAuthenticator:
             data_dict = {
                 'data': {
                     'attributes': {
-                        'password': self.password, 'username': self.username,
-                        'env': 'prod'
+                        'password': self.password,
+                        'username': self.username,
+                        'endpoint': self.endpoint
                     },
                     'type': 'auth'
                 }
@@ -176,7 +179,7 @@ class TestJuiceBoxAuthenticator:
     @patch('juicebox_cli.auth.jb_requests')
     def test_get_juicebox_token_failed(self, req_mock, netrc_mock):
         req_mock.post.return_value = Response(409, {})
-        jba = JuiceBoxAuthenticator(self.username, self.password)
+        jba = JuiceBoxAuthenticator(self.username, self.password, self.endpoint)
         with pytest.raises(AuthenticationError) as exc_info:
             jba.get_juicebox_token()
             assert 'unable to authenticate' in str(exc_info)
@@ -185,7 +188,7 @@ class TestJuiceBoxAuthenticator:
                           data=ANY,
                           headers={'content-type': 'application/json'})]
             first_call = req_mock.mock_calls[0]
-            data_dict = {'password': self.password, 'username': self.username}
+            data_dict = {'password': self.password, 'username': self.username, 'endpoint': self.endpoint}
             assert data_dict == json.loads(first_call[2]['data'])
             assert netrc_mock.mock_calls == [call.netrc()]
 
@@ -197,7 +200,7 @@ class TestJuiceBoxAuthenticator:
         auth_fake = ('chris@juice.com', None,
                      'token')
         netrc_mock.netrc.return_value.authenticators.return_value = auth_fake
-        jba = JuiceBoxAuthenticator(self.username, self.password)
+        jba = JuiceBoxAuthenticator(self.username, self.password, self.endpoint)
         username, token = jba.get_netrc_token()
         if os.name == 'nt':
             assert netrc_mock.mock_calls == [
@@ -221,7 +224,7 @@ class TestJuiceBoxAuthenticator:
         path_mock.expanduser.return_value = self.windows_home_path
         path_mock.join.return_value = self.windows_netrc_file
         netrc_mock.netrc.return_value.authenticators.return_value = ()
-        jba = JuiceBoxAuthenticator(self.username, self.password)
+        jba = JuiceBoxAuthenticator(self.username, self.password, self.endpoint)
         username, token = jba.get_netrc_token()
         if os.name == 'nt':
             assert netrc_mock.mock_calls == [
@@ -260,7 +263,7 @@ machine git.heroku.com
                 if os.name == 'nt':
                     path_mock.expanduser.return_value = self.windows_home_path
                     path_mock.join.return_value = self.windows_netrc_file
-                jba = JuiceBoxAuthenticator(self.username, self.password)
+                jba = JuiceBoxAuthenticator(self.username, self.password, self.endpoint)
                 jba.update_netrc()
                 assert call().readlines() in o_mock.mock_calls
                 assert call().writelines(output_lines) in o_mock.mock_calls
@@ -304,7 +307,7 @@ machine api.juiceboxdata.com
                 if os.name == 'nt':
                     path_mock.expanduser.return_value = self.windows_home_path
                     path_mock.join.return_value = self.windows_netrc_file
-                jba = JuiceBoxAuthenticator(self.username, self.password)
+                jba = JuiceBoxAuthenticator(self.username, self.password, self.endpoint)
                 jba.update_netrc()
                 assert call().readlines() in o_mock.mock_calls
                 assert call().writelines(output_lines) in o_mock.mock_calls

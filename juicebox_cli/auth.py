@@ -15,9 +15,9 @@ class JuiceBoxAuthenticator:
     netrc_proxy = None
     token = None
 
-    def __init__(self, username=None, password=None, env='prod',
+    def __init__(self, username=None, password=None, endpoint=None,
                  netrc_location=None):
-        self.env = env
+        self.endpoint = endpoint
         logger.debug('Initializing JBAuth via netrc')
         try:
             if netrc_location:
@@ -68,13 +68,13 @@ class JuiceBoxAuthenticator:
         :type save: bool
         """
         logger.debug('Getting JB token from Public API')
-        url = '{}/token/'.format(get_public_api(self.env))
+        url = '{}/token/'.format(get_public_api())
         data = {
             'data': {
                 'attributes': {
                     'username': self.username,
                     'password': self.password,
-                    'env': self.env
+                    'endpoint': self.endpoint
                 },
                 'type': 'auth'
             }

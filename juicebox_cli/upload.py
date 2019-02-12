@@ -14,8 +14,8 @@ from juicebox_cli.jb_requests import jb_requests
 
 
 class S3Uploader:
-    def __init__(self, files, env='prod', netrc=None):
-        self.env = env
+    def __init__(self, files, endpoint=None, netrc=None):
+        self.endpoint = endpoint
         logger.debug('Initializing Uploader')
         self.files = list(files)
         self.jb_auth = JuiceBoxAuthenticator(netrc_location=netrc)
@@ -23,16 +23,15 @@ class S3Uploader:
             logger.debug('User missing auth information')
             raise AuthenticationError('Please login first.')
 
-    def get_s3_upload_token(self, client=None):
+    def get_s3_upload_token(self):
         logger.debug('Getting STS S3 Upload token')
-        url = '{}/upload-token/'.format(get_public_api(self.env))
+        url = '{}/upload-token/'.format(get_public_api())
         data = {
             'data': {
                 'attributes': {
                     'username': self.jb_auth.username,
                     'token': self.jb_auth.token,
-                    'client': client,
-                    'env': self.env
+                    'endpoint': self.endpoint
                 },
                 'type': 'jbtoken'
             }
@@ -53,8 +52,8 @@ class S3Uploader:
         logger.debug('Successfully retrieved STS S3 Upload token')
         return credentials
 
-    def upload(self, client=None, app=None):
-        credentials = self.get_s3_upload_token(client)
+    def upload(self, app=None):
+        credentials = self.get_s3_upload_token()
 
         logger.debug('Initializing S3 client')
         s3_creds = credentials['data']['attributes']

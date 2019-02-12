@@ -7,21 +7,10 @@ import requests
 
 from . import __version__
 from .auth import JuiceBoxAuthenticator
-from .clients import JBClients
 from . import config
 from .exceptions import AuthenticationError
 from .logger import logger
 from .upload import S3Uploader
-
-
-def validate_environment(ctx, env):
-    try:
-        config.get_public_api(env)
-    except Exception:
-        message = 'The supplied environment is not valid. Please choose ' \
-                  'from: {}.'.format(', '.join(config.PUBLIC_API_URLS.keys()))
-        click.echo(click.style(message, fg='red'))
-        ctx.abort()
 
 
 @click.group()
@@ -38,14 +27,13 @@ def cli(debug, api):
 
 @cli.command()
 @click.argument('username')
-@click.option('--env', envvar='JB_ENV', default='prod')
+@click.option('--endpoint', envvar='JB_ENDPOINT', required=True)
 @click.pass_context
-def login(ctx, username, env):
-    validate_environment(ctx, env)
+def login(ctx, username, endpoint):
     logger.debug('Attempting login for %s', username)
     password = click.prompt('Password', type=str, hide_input=True)
 
-    jb_auth = JuiceBoxAuthenticator(username, password, env)
+    jb_auth = JuiceBoxAuthenticator(username, password, endpoint)
     try:
         jb_auth.get_juicebox_token(save=True)
     except AuthenticationError as exc_info:
@@ -67,25 +55,23 @@ def login(ctx, username, env):
 @click.option('--netrc', default=None)
 @click.option('--job')
 @click.option('--app', default=None)
-@click.option('--env', envvar='JB_ENV', default='prod')
-@click.option('--client', default=None)
+@click.option('--endpoint', envvar='JB_ENDPOINT', required=True)
 @click.pass_context
-def upload(ctx, client, env, app, job, netrc, files):
-    validate_environment(ctx, env)
-    logger.debug('Starting upload for %s - %s: %s', env, job, files)
+def upload(ctx, endpoint, app, job, netrc, files):
+    logger.debug('Starting upload for %s - %s: %s', endpoint, job, files)
     if not files:
         logger.debug('No files to upload')
         click.echo(click.style('No files to upload', fg='green'))
         return
     try:
-        s3_uploader = S3Uploader(files, env, netrc)
+        s3_uploader = S3Uploader(files, endpoint, netrc)
     except AuthenticationError as exc_info:
         click.echo(click.style(str(exc_info), fg='red'))
         ctx.abort()
 
     failed_files = None
     try:
-        failed_files = s3_uploader.upload(client, app)
+        failed_files = s3_uploader.upload(app)
     except requests.ConnectionError:
         message = 'Failed to connect to public API'
         logger.debug(message)
@@ -103,35 +89,3 @@ def upload(ctx, client, env, app, job, netrc, files):
 
     logger.debug('upload successful')
     click.echo(click.style('Successfully Uploaded', fg='green'))
-
-def _clients_list(ctx, env):
-    validate_environment(ctx, env)
-    try:
-        jb_clients = JBClients(env)
-        clients = jb_clients.get_simple_client_list()
-    except AuthenticationError as exc_info:
-        click.echo(click.style(str(exc_info), fg='red'))
-        ctx.abort()
-    except requests.ConnectionError:
-        message = 'Failed to connect to public API'
-        logger.debug(message)
-        click.echo(click.style(message, fg='red'))
-        ctx.abort()
-    click.echo('Client ID       Client Name')
-    click.echo('--------------  -------------------------------------')
-    for client_id, client_name in sorted(clients.items()):
-        click.echo('{:14}  {}'.format(client_id, client_name))
-
-
-@cli.command(name='clients_list')
-@click.option('--env', envvar='JB_ENV', default='prod')
-@click.pass_context
-def clients_list(ctx, env):
-    return _clients_list(ctx, env)
-
-
-@cli.command(name='clients-list')
-@click.option('--env', envvar='JB_ENV', default='prod')
-@click.pass_context
-def _clients_dash_list(ctx, env):
-    return _clients_list(ctx, env)
