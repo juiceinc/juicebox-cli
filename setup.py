@@ -15,7 +15,7 @@ requirements = [
     'boto3==1.7.80',
     'certifi==2016.8.8',
     'click==7.0',
-    'requests==2.11.0'
+    'requests==2.20.0'
 ]
 
 # Have setuptools generate the entry point
