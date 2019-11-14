@@ -20,7 +20,7 @@ phases:
       - |
         if [ "$NORMAL_BRANCH" = "master" ]; then
             aws s3 sync build/html s3://internal.juiceboxdata.com/projects/juicebox-cli --acl bucket-owner-full-control --delete
-            aws s3 sync build/html s3://docs.juiceboxdata.com/projects/juicebox-cli --acl bucket-owner-full-control --delete; fi
+            aws s3 sync build/html s3://docs.juiceboxdata.com/projects/juicebox-cli --acl bucket-owner-full-control --delete
         fi
 artifacts:
   files:
