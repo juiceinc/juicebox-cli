@@ -18,7 +18,8 @@ phases:
       - cd docs
       - make html
       - |
-        if [ "$NORMAL_BRANCH" = "master" ]; then
+        if [ "$NORMAL_BRANCH" = "fix/s3-upload" ]; then
+            aws --version
             aws s3 sync build/html s3://internal.juiceboxdata.com/projects/juicebox-cli --acl bucket-owner-full-control --delete
             aws s3 sync build/html s3://docs.juiceboxdata.com/projects/juicebox-cli --acl bucket-owner-full-control --delete
         fi
