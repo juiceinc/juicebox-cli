@@ -5,12 +5,26 @@
 #    pip-compile
 #
 boto3==1.7.80
-botocore==1.10.84         # via boto3, s3transfer
-certifi==2016.8.8
+    # via -r requirements.in
+botocore==1.10.84
+    # via
+    #   boto3
+    #   s3transfer
+certifi==2022.12.7
+    # via -r requirements.in
 click==7.0
-docutils==0.15.2          # via botocore
-jmespath==0.9.4           # via boto3, botocore
-python-dateutil==2.8.1    # via botocore
+    # via -r requirements.in
+docutils==0.15.2
+    # via botocore
+jmespath==0.9.4
+    # via
+    #   boto3
+    #   botocore
+python-dateutil==2.8.1
+    # via botocore
 requests==2.11.0
-s3transfer==0.1.13        # via boto3
-six==1.13.0               # via python-dateutil
+    # via -r requirements.in
+s3transfer==0.1.13
+    # via boto3
+six==1.13.0
+    # via python-dateutil

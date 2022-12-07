@@ -13,7 +13,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 requirements = [
     'boto3==1.7.80',
-    'certifi==2016.8.8',
+    'certifi==2022.12.7',
     'click==7.0',
     'requests==2.11.0'
 ]
