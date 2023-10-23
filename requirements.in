@@ -1,4 +1,5 @@
-boto3==1.7.80
+six==1.16.0
+boto3==1.28.69
 certifi==2023.7.22
 click==7.0
-requests==2.11.0
+requests==2.31.0
