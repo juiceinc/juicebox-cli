@@ -12,10 +12,10 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 requirements = [
-    'boto3==1.7.80',
-    'certifi==2023.7.22',
+    'boto3>=1.7.80',
+    'certifi>=2023.7.22',
     'click==7.0',
-    'requests==2.11.0'
+    'requests>=2.11.0'
 ]
 
 # Have setuptools generate the entry point

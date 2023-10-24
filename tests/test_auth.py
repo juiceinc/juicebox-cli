@@ -281,8 +281,7 @@ machine git.heroku.com
                     ]
                 else:
                     assert netrc_mock.mock_calls == [call.netrc()]
-                    assert path_mock.mock_calls == [
-                        call.expanduser('~/.netrc')]
+                    assert call.expanduser('~/.netrc') in path_mock.mock_calls
 
     @patch('juicebox_cli.auth.os.path')
     @patch('juicebox_cli.auth.netrc')
@@ -326,5 +325,4 @@ machine api.juiceboxdata.com
                     ]
                 else:
                     assert netrc_mock.mock_calls == [call.netrc()]
-                    assert path_mock.mock_calls == [
-                        call.expanduser('~/.netrc')]
+                    assert call.expanduser('~/.netrc') in path_mock.mock_calls

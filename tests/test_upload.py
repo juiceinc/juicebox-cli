@@ -21,8 +21,10 @@ class TestS3Uploader:
         s3u = S3Uploader(files)
         assert s3u.files == files
         assert s3u.jb_auth
-        assert call() in jba_mock.mock_calls
-        assert call().is_auth_preped() in jba_mock.mock_calls
+        assert jba_mock.mock_calls == [
+            call(netrc_location=None),
+            call().is_auth_preped(),
+            call().__bool__()]
 
     @patch('juicebox_cli.upload.JuiceBoxAuthenticator')
     def test_init_without_auth(self, jba_mock):
