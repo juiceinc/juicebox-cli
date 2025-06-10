@@ -1,7 +1,7 @@
 import json
 import sys
 
-from mock import call, patch, ANY, mock_open
+from unittest.mock import call, patch, ANY, mock_open
 import pytest
 
 from juicebox_cli.exceptions import AuthenticationError
@@ -9,7 +9,7 @@ from juicebox_cli.upload import S3Uploader
 from tests.response import Response
 
 
-open_name = 'builtins.open' if sys.version_info >= (3,) else '__builtin__.open'
+open_name = 'builtins.open'
 
 
 class TestS3Uploader:
@@ -21,7 +21,7 @@ class TestS3Uploader:
         s3u = S3Uploader(files)
         assert s3u.files == files
         assert s3u.jb_auth
-        assert call() in jba_mock.mock_calls
+        assert call(netrc_location=None) in jba_mock.mock_calls
         assert call().is_auth_preped() in jba_mock.mock_calls
 
     @patch('juicebox_cli.upload.JuiceBoxAuthenticator')

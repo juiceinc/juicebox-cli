@@ -1,6 +1,6 @@
 import requests
 from click.testing import CliRunner
-from mock import call, patch
+from unittest.mock import call, patch
 
 from juicebox_cli.cli import cli
 from juicebox_cli.exceptions import AuthenticationError
@@ -10,7 +10,7 @@ class TestCLI:
 
     def test_base(self):
         runner = CliRunner()
-        result = runner.invoke(cli)
+        result = runner.invoke(cli, ['--help'])
 
         assert 'Juicebox CLI app' in result.output
         assert result.exit_code == 0
@@ -20,7 +20,7 @@ class TestCLI:
         result = runner.invoke(cli, ['cookies'])
 
         assert result.exit_code == 2
-        assert 'No such command "cookies"' in result.output
+        assert "Error: No such command 'cookies'." in result.output
 
     @patch('juicebox_cli.cli.JuiceBoxAuthenticator')
     @patch('juicebox_cli.cli.click.prompt')

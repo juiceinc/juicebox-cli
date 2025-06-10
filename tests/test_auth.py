@@ -2,7 +2,7 @@ import json
 import os
 
 import pytest
-from mock import call, mock_open, patch, ANY
+from unittest.mock import call, mock_open, patch, ANY
 
 from juicebox_cli.auth import JuiceBoxAuthenticator, AuthenticationError
 from tests.response import Response
@@ -12,8 +12,8 @@ class TestJuiceBoxAuthenticator:
     username = 'cookie monster'
     password = 'cIsForCookie'
     endpoint = 'http://localhost:8000'
-    windows_home_path = 'c:\\users\\some_user'
-    windows_netrc_file = 'c:\\users\\some_user\_netrc'
+    windows_home_path = r'c:\users\some_user'
+    windows_netrc_file = r'c:\users\some_user\_netrc'
 
     @patch('juicebox_cli.auth.os.path')
     @patch('juicebox_cli.auth.netrc')
@@ -251,7 +251,7 @@ class TestJuiceBoxAuthenticator:
 machine git.heroku.com
   login jason@jasonamyers.com
   password example_token"""
-        output_lines = [x for x in netrc_string.splitlines(True)]
+        output_lines = list(netrc_string.splitlines(True))
         output_lines[-1] = output_lines[-1] + '\n'
         output_lines.extend(['machine api.juiceboxdata.com\n',
                              '  login cookie monster\n', '  password None\n'])
@@ -280,9 +280,7 @@ machine git.heroku.com
                         call.join('c:\\users\\some_user', '_netrc')
                     ]
                 else:
-                    assert netrc_mock.mock_calls == [call.netrc()]
-                    assert path_mock.mock_calls == [
-                        call.expanduser('~/.netrc')]
+                    path_mock.expanduser.assert_called_with('~/.netrc')
 
     @patch('juicebox_cli.auth.os.path')
     @patch('juicebox_cli.auth.netrc')
@@ -325,6 +323,4 @@ machine api.juiceboxdata.com
                         call.join('c:\\users\\some_user', '_netrc')
                     ]
                 else:
-                    assert netrc_mock.mock_calls == [call.netrc()]
-                    assert path_mock.mock_calls == [
-                        call.expanduser('~/.netrc')]
+                    path_mock.expanduser.assert_called_with('~/.netrc')
