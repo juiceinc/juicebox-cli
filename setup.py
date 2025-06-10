@@ -1,15 +1,22 @@
-from setuptools import setup, find_packages
-
+import os
+import re
 from codecs import open
 from os import path
+from setuptools import setup, find_packages
 
 from juicebox_cli import __version__
 
 here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the README file
-with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
-    long_description = f.read()
+def get_version(package):
+    """Return package version as listed in `__version__` in `init.py`."""
+    with open(os.path.join(package, '__init__.py')) as f:
+        return re.search("__version__ = ['\"]([^'\"]+)['\"]", f.read())[1]
+    return None
+
+import pathlib
+long_description = pathlib.Path('README.rst').read_text()
 
 requirements = [
     'boto3>=1.28.0',
@@ -27,11 +34,11 @@ entry_points = {
 
 setup(
     name='juicebox-cli',
-    version=__version__,
+    version=get_version('juicebox_cli'),
     description='Juicebox CLI',
     long_description=long_description,
     author='Juice Analytics',
-    author_email='tim.oguin@juiceanalytics.com',
+    author_email='casey.wireman@juiceanalytics.com',
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
     install_requires=requirements,
     entry_points=entry_points,
