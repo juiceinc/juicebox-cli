@@ -1,5 +1,5 @@
 -r requirements.txt
-bump2version>=0.7.0
+bumpversion>=0.6.0
 check-manifest>=0.40
 pytest>=7.0.0
 flake8>=6.0.0

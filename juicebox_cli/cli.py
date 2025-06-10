@@ -3,6 +3,7 @@
 import logging
 
 import click
+import os
 import requests
 
 from . import __version__
@@ -28,13 +29,14 @@ def cli(debug, api):
 @cli.command()
 @click.argument('username')
 @click.option('--endpoint', envvar='JB_ENDPOINT', required=True)
-@click.option('--password', help='Specify password on the command line. Use single quotes if it contains special characters.')
+@click.option('--password', envvar='JB_PASSWORD', help='Password (⚠ visible via shell history; prefer the JB_PASSWORD env var or interactive prompt).')
 @click.pass_context
 def login(ctx, username, endpoint, password):
     logger.debug('Attempting login for %s', username)
-    if not password:
+    if os.getenv('JB_PASSWORD') is None:
         password = click.prompt('Password', type=str, hide_input=True)
-
+    else:
+        password = os.getenv('JB_PASSWORD')
     jb_auth = JuiceBoxAuthenticator(username, password, endpoint)
     try:
         jb_auth.get_juicebox_token(save=True)

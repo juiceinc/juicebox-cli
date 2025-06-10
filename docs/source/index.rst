@@ -33,9 +33,12 @@ After juicebox-cli has been installed, the juice command will be available. To b
 
 After typing this in, we will be prompted for our Juicebox account password. (Note: the account used must be a Juicebox client admin account. Contact Juicebox support if you need help obtaining a client admin account.)
 
-If your password contains special characters, you'll need to pass it as an argument. For example, if your password is `MyPassword123!`, you would use the following command::
+If your password contains special characters, you'll need to set the JB_PASSWORD environment variable. For example, if your password is `MyPassword123!`, you would use the following command::
 
-    $ juice login user@domain.com --endpoint https://mydomain.juiceboxdata.com --password 'MyPassword123!'
+    $ export JB_PASSWORD='MyPassword123!'
+    $ juice login user@domain.com --endpoint https://mydomain.juiceboxdata.com
+
+This set of commands will authenticate us with your Juicebox account.  This method allows us to keep credentials out of your terminal history.  If the environment variable is not set, the CLI will prompt you for your password, but again, it is required if your password contains special characters.
 
 If we are operating in an environment other than our normal production environment, we need to provide the corresponding environment's url via the ``--endpoint`` option::
 

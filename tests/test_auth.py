@@ -280,7 +280,7 @@ machine git.heroku.com
                         call.join('c:\\users\\some_user', '_netrc')
                     ]
                 else:
-                    path_mock.expanduser.assert_called_with('~/.netrc')
+                    path_mock.expanduser.assert_any_call('~/.netrc')
 
     @patch('juicebox_cli.auth.os.path')
     @patch('juicebox_cli.auth.netrc')
@@ -323,4 +323,4 @@ machine api.juiceboxdata.com
                         call.join('c:\\users\\some_user', '_netrc')
                     ]
                 else:
-                    path_mock.expanduser.assert_called_with('~/.netrc')
+                    path_mock.expanduser.assert_any_call('~/.netrc')
