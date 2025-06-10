@@ -1,0 +1,11 @@
+-r requirements.txt
+bumpversion>=0.6.0
+check-manifest>=0.40
+pytest>=7.0.0
+flake8>=6.0.0
+Sphinx>=5.0.0
+tox>=4.0.0
+tox-pyenv>=1.0.2
+twine>=4.0.0
+pytest-cov>=4.0.0
+pyinstaller>=5.0.0
