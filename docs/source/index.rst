@@ -6,6 +6,8 @@
 Welcome to Juicebox CLI's documentation!
 ========================================
 
+Version: |release|
+
 Installation
 ------------
 
