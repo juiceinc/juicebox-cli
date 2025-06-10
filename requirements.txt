@@ -14,8 +14,9 @@ click==8.2.1
     # via -r requirements.in
 idna==3.10
     # via requests
-jmespath==0.9.4
+jmespath==1.0.1
     # via
+    #   -r requirements.in
     #   boto3
     #   botocore
 python-dateutil==2.9.0.post0
