@@ -28,10 +28,12 @@ def cli(debug, api):
 @cli.command()
 @click.argument('username')
 @click.option('--endpoint', envvar='JB_ENDPOINT', required=True)
+@click.option('--password', help='Specify password on the command line. Use single quotes if it contains special characters.')
 @click.pass_context
-def login(ctx, username, endpoint):
+def login(ctx, username, endpoint, password):
     logger.debug('Attempting login for %s', username)
-    password = click.prompt('Password', type=str, hide_input=True)
+    if not password:
+        password = click.prompt('Password', type=str, hide_input=True)
 
     jb_auth = JuiceBoxAuthenticator(username, password, endpoint)
     try:
