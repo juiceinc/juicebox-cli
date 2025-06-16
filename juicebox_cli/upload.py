@@ -25,7 +25,7 @@ class S3Uploader:
 
     def get_s3_upload_token(self):
         logger.debug('Getting STS S3 Upload token')
-        url = '{}/upload-token/'.format(get_public_api())
+        url = f'{get_public_api()}/upload-token/'
         data = {
             'data': {
                 'attributes': {
@@ -97,10 +97,9 @@ class S3Uploader:
                 logger.debug('%s: is a hidden file, skipping', upload_file)
                 continue
             filename = filename.replace('\\', '/')
-            key = '{}/{}/{}'.format(client_id, generated_folder, filename)
+            key = f'{client_id}/{generated_folder}/{filename}'
             if app:
-                key = '{}/{}/{}/{}'.format(client_id, app, generated_folder,
-                                           filename)
+                key = f'{client_id}/{app}/{generated_folder}/{filename}'
             with open(upload_file, 'rb') as upload_fileobject:
                 try:
                     logger.debug('Uploading file: %s', upload_file)

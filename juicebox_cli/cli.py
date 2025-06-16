@@ -57,12 +57,11 @@ def login(ctx, username, endpoint, password):
 @click.argument('files', nargs=-1,
                 type=click.Path(exists=True, dir_okay=True, readable=True))
 @click.option('--netrc', default=None)
-@click.option('--job')
 @click.option('--app', default=None)
 @click.option('--endpoint', envvar='JB_ENDPOINT', required=True)
 @click.pass_context
-def upload(ctx, endpoint, app, job, netrc, files):
-    logger.debug('Starting upload for %s - %s: %s', endpoint, job, files)
+def upload(ctx, endpoint, app, netrc, files):
+    logger.debug('Starting upload for %s - %s: %s', endpoint, files)
     if not files:
         logger.debug('No files to upload')
         click.echo(click.style('No files to upload', fg='green'))
@@ -86,7 +85,7 @@ def upload(ctx, endpoint, app, job, netrc, files):
         ctx.abort()
 
     if failed_files:
-        message = 'Failed to upload {}'.format(', '.join(failed_files))
+        message = f"Failed to upload {', '.join(failed_files)}"
         logger.debug(message)
         click.echo(click.style(message, fg='red'))
         ctx.abort()

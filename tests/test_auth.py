@@ -96,7 +96,7 @@ class TestJuiceBoxAuthenticator:
     def test_get_juicebox_token(self, req_mock, netrc_mock, path_mock):
         path_mock.expanduser.return_value = self.windows_home_path
         path_mock.join.return_value = self.windows_netrc_file
-        req_mock.post.return_value = Response(201, {
+        req_mock.post.return_value = Response(200, {
             'data': {
                 'attributes': {
                     'token': 'dis_token'
@@ -107,9 +107,10 @@ class TestJuiceBoxAuthenticator:
         jba.get_juicebox_token()
         assert jba.token == 'dis_token'
         assert req_mock.mock_calls == [
-            call.post('https://api.juiceboxdata.com/token/',
+            call.post(f'{jba.endpoint}/token',
                       data=ANY,
                       headers={'content-type': 'application/json'})]
+
         first_call = req_mock.mock_calls[0]
         data_dict = {
             'data': {
@@ -137,7 +138,7 @@ class TestJuiceBoxAuthenticator:
     def test_get_juicebox_token_save(self, req_mock, netrc_mock, path_mock):
         path_mock.expanduser.return_value = self.windows_home_path
         path_mock.join.return_value = self.windows_netrc_file
-        req_mock.post.return_value = Response(201, {
+        req_mock.post.return_value = Response(200, {
             'data': {
                 'attributes': {
                     'token': 'dis_token'
@@ -150,7 +151,7 @@ class TestJuiceBoxAuthenticator:
             jba.get_juicebox_token(save=True)
             assert jba.token == 'dis_token'
             assert req_mock.mock_calls == [
-                call.post('https://api.juiceboxdata.com/token/',
+                call.post(f'{jba.endpoint}/token',
                           data=ANY,
                           headers={'content-type': 'application/json'})]
             first_call = req_mock.mock_calls[0]
@@ -182,9 +183,11 @@ class TestJuiceBoxAuthenticator:
         jba = JuiceBoxAuthenticator(self.username, self.password, self.endpoint)
         with pytest.raises(AuthenticationError) as exc_info:
             jba.get_juicebox_token()
+            assert jba.token == 'dis_token'
+
             assert 'unable to authenticate' in str(exc_info)
             assert req_mock.mock_calls == [
-                call.post('https://api.juiceboxdata.com/token/',
+                call.post(f'{jba.endpoint}/token',
                           data=ANY,
                           headers={'content-type': 'application/json'})]
             first_call = req_mock.mock_calls[0]

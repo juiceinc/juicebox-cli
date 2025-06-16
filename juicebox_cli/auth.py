@@ -34,11 +34,10 @@ class JuiceBoxAuthenticator:
         except Exception as exc_info:
             if netrc_location:
                 logger.debug(str(exc_info))
-                raise ValueError('Could not read token from %s',
-                                 netrc_location)
-            netrc_filename = '.netrc'
-            if os.name == 'nt':
-                netrc_filename = '_netrc'
+                raise ValueError(
+                    'Could not read token from %s', netrc_location
+                ) from exc_info
+            netrc_filename = '_netrc' if os.name == 'nt' else '.netrc'
             home = os.path.expanduser("~")
             netrc_file = os.path.join(home, netrc_filename)
             open(netrc_file, 'w').close()
@@ -68,21 +67,17 @@ class JuiceBoxAuthenticator:
         :type save: bool
         """
         logger.debug('Getting JB token from Public API')
-        url = '{}/token/'.format(get_public_api())
+        url = f'{get_public_api()}/token'
         data = {
-            'data': {
-                'attributes': {
                     'username': self.username,
                     'password': self.password,
                     'endpoint': self.endpoint
-                },
-                'type': 'auth'
-            }
-        }
+                }
+
         headers = {'content-type': 'application/json'}
         response = jb_requests.post(url, data=json.dumps(data),
                                     headers=headers)
-        if response.status_code != 201:
+        if response.status_code != 200:
             logger.debug(response)
             raise AuthenticationError('I was unable to authenticate you with '
                                       'those credentials')

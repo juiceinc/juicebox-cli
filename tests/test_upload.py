@@ -1,13 +1,11 @@
 import json
-import sys
-
 from unittest.mock import call, patch, ANY, mock_open
+
 import pytest
 
 from juicebox_cli.exceptions import AuthenticationError
 from juicebox_cli.upload import S3Uploader
 from tests.response import Response
-
 
 open_name = 'builtins.open'
 
@@ -50,13 +48,14 @@ class TestS3Uploader:
         req_mock.post.return_value = Response(200, {'data': {
             'attributes': credentials}})
         files = ['cookies.txt', 'bad_cakes.zip']
-        s3u = S3Uploader(files, 'http://localhost:8000')
+        endpoint = 'http://localhost:8000'
+        s3u = S3Uploader(files, endpoint)
         results = s3u.get_s3_upload_token()
         assert results == {'data': {'attributes': credentials}}
         assert jba_mock.mock_calls == [call(netrc_location=None),
                                        call().is_auth_preped()]
         assert req_mock.mock_calls == [
-            call.post('https://api.juiceboxdata.com/upload-token/',
+            call.post(f'{endpoint}/upload-token/',
                       data=ANY,
                       headers={'content-type': 'application/json'})]
         first_call = req_mock.mock_calls[0]
@@ -65,7 +64,7 @@ class TestS3Uploader:
                 'attributes': {
                     'token': 'cookies',
                     'username': 'chris@juice.com',
-                    'endpoint': 'http://localhost:8000'
+                    'endpoint': endpoint
                 },
                 'type': 'jbtoken'
             }

@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
 
-file_log_handler = logging.FileHandler('{}.log'.format(__name__))
+file_log_handler = logging.FileHandler(f'{__name__}.log')
 logger.addHandler(file_log_handler)
 
 stderr_log_handler = logging.StreamHandler()
