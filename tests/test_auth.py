@@ -1,17 +1,12 @@
 # In tests/test_auth.py
 
-import json
-import netrc
 import os
 import stat  # <--- ENSURE THIS IS IMPORTED
 import unittest
-from unittest.mock import MagicMock, call, mock_open, patch
+from unittest.mock import call, mock_open, patch
 
-import pytest
-import jwt
 from juicebox_cli.auth import JuiceBoxAuthenticator
-from juicebox_cli.config import NETRC_HOST_NAME, get_public_api
-from juicebox_cli.exceptions import AuthenticationError
+from juicebox_cli.config import NETRC_HOST_NAME
 from tests.response import Response
 
 

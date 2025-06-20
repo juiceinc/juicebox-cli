@@ -1,15 +1,13 @@
 # In tests/test_cli.py
 
-import json
-import os
 import unittest
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import patch
 
-from click.testing import CliRunner
-from juicebox_cli.cli import cli
-from juicebox_cli.auth import JuiceBoxAuthenticator
-from juicebox_cli.exceptions import AuthenticationError
 import requests
+from click.testing import CliRunner
+
+from juicebox_cli.cli import cli
+from juicebox_cli.exceptions import AuthenticationError
 
 
 class TestCLI(unittest.TestCase):

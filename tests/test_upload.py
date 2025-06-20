@@ -1,15 +1,12 @@
 # In tests/test_upload.py
 
-import os
-import unittest
-from unittest.mock import MagicMock, call, mock_open, patch
-
-import pytest
-from juicebox_cli.upload import S3Uploader
-from juicebox_cli.exceptions import AuthenticationError
-from tests.response import Response
-from juicebox_cli.config import get_public_api
 import json
+import unittest
+from unittest.mock import MagicMock, mock_open, patch
+
+from juicebox_cli.config import get_public_api
+from juicebox_cli.upload import S3Uploader
+from tests.response import Response
 
 # Define open_name for cross-platform open patching
 open_name = "__builtin__.open" if "__builtin__" in globals() else "builtins.open"

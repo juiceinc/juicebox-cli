@@ -1,5 +1,3 @@
-# In juicebox_cli/upload.py
-
 """Uploads files to s3"""
 import json
 import os
