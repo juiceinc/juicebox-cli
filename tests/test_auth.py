@@ -18,7 +18,7 @@ from tests.response import Response
 class TestJuiceBoxAuthenticator(unittest.TestCase):
     def setUp(self):
         self.username = "cookie monster"
-        self.password = "xgs123!@#"
+        self.password = "supersecretpassword"
         self.endpoint = "http://localhost:8000"
         self.test_jwt_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2NzIyNDQ0MDAsImV4cCI6MTk4NzYwNDQwMCwianRpIjoiZmFrZS1qdGkiLCJ1c2VyX2lkIjoxLCJlbWFpbCI6ImNvY29AcGllcy5jb20iLCJjbGllbnQiOjF9.signature"
         self.test_jwt_payload = {
@@ -81,7 +81,15 @@ class TestJuiceBoxAuthenticator(unittest.TestCase):
         path_mock.join.return_value = self.windows_netrc_file
 
         req_mock.post.return_value = Response(
-            200, {"data": {"username": self.username, "token": self.test_jwt_token}}
+            200,
+            {
+                "data": {
+                    "attributes": {
+                        "username": self.username,
+                        "token": self.test_jwt_token,
+                    }
+                }
+            },
         )
         jwt_mock.decode.return_value = self.test_jwt_payload
 
@@ -101,7 +109,15 @@ class TestJuiceBoxAuthenticator(unittest.TestCase):
         path_mock.join.return_value = self.windows_netrc_file
 
         req_mock.post.return_value = Response(
-            200, {"data": {"username": self.username, "token": self.test_jwt_token}}
+            200,
+            {
+                "data": {
+                    "attributes": {
+                        "username": self.username,
+                        "token": self.test_jwt_token,
+                    }
+                }
+            },
         )
         jwt_mock.decode.return_value = self.test_jwt_payload
 

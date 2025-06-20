@@ -28,7 +28,9 @@ class TestCLI(unittest.TestCase):
         )
 
         jba_mock.assert_called_once_with(self.username, self.password, self.endpoint)
-        jba_mock.return_value.get_juicebox_token.assert_called_once_with(save=True)
+        jba_mock.return_value.get_juicebox_token.assert_called_once_with(
+            self.username, self.password, self.endpoint, save=True
+        )
 
         # MODIFIED: Assert output string
         assert "Successfully Authenticated!" in result.output  # <--- UPDATED THIS LINE
@@ -44,7 +46,9 @@ class TestCLI(unittest.TestCase):
         )
 
         jba_mock.assert_called_once_with(self.username, self.password, self.endpoint)
-        jba_mock.return_value.get_juicebox_token.assert_called_once_with(save=True)
+        jba_mock.return_value.get_juicebox_token.assert_called_once_with(
+            self.username, self.password, self.endpoint, save=True
+        )
 
         # MODIFIED: Assert output string
         assert "Successfully Authenticated!" in result.output  # <--- UPDATED THIS LINE
@@ -63,7 +67,9 @@ class TestCLI(unittest.TestCase):
         )
 
         jba_mock.assert_called_once_with(self.username, self.password, self.endpoint)
-        jba_mock.return_value.get_juicebox_token.assert_called_once_with(save=True)
+        jba_mock.return_value.get_juicebox_token.assert_called_once_with(
+            self.username, self.password, self.endpoint, save=True
+        )
 
         assert "Bad Login" in result.output
         assert result.exit_code == 1
@@ -81,7 +87,9 @@ class TestCLI(unittest.TestCase):
         )
 
         jba_mock.assert_called_once_with(self.username, self.password, self.endpoint)
-        jba_mock.return_value.get_juicebox_token.assert_called_once_with(save=True)
+        jba_mock.return_value.get_juicebox_token.assert_called_once_with(
+            self.username, self.password, self.endpoint, save=True
+        )
 
         assert "Failed to connect to public API" in result.output
         assert result.exit_code == 1

@@ -43,7 +43,10 @@ def login(ctx, username, endpoint, password):
         password = os.getenv("JB_PASSWORD")
     jb_auth = JuiceBoxAuthenticator(username, password, endpoint)
     try:
-        jb_auth.get_juicebox_token(save=True)
+        jb_auth.get_juicebox_token(username,
+                                   password,
+                                   endpoint,
+                                   save=True)
     except AuthenticationError as exc_info:
         click.echo(click.style(str(exc_info), fg="red"))
         ctx.abort()

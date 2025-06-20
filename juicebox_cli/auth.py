@@ -113,8 +113,8 @@ class JuiceBoxAuthenticator:
                 f"I was unable to authenticate you with "
                 f"those credentials. Server response: {response.text}"
             )
-
-        token = response.json()["data"]["token"]
+        print(f"DEBUG: API Response: {response.json()}")
+        token = response.json()["data"]["attributes"]["token"]
 
         self.username = username  # Update self.username after successful login
         self.token = token
