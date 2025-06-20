@@ -61,7 +61,7 @@ def login(ctx, username, endpoint, password):
 @click.option('--endpoint', envvar='JB_ENDPOINT', required=True)
 @click.pass_context
 def upload(ctx, endpoint, app, netrc, files):
-    logger.debug('Starting upload for %s - %s: %s', endpoint, files)
+    logger.debug('Starting upload for endpoint: %s, files: %s', endpoint, files)
     if not files:
         logger.debug('No files to upload')
         click.echo(click.style('No files to upload', fg='green'))

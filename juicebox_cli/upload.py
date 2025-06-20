@@ -1,3 +1,5 @@
+# In juicebox_cli/upload.py
+
 """Uploads files to s3
 """
 import json
@@ -22,23 +24,47 @@ class S3Uploader:
         if not self.jb_auth.is_auth_preped():
             logger.debug('User missing auth information')
             raise AuthenticationError('Please login first.')
+        if not self.jb_auth.client_id:
+            logger.error("Could not determine client ID from token. Please ensure your token contains a 'client' claim.")
+            raise AuthenticationError("Could not determine client ID from token. Please ensure your token contains a 'client' claim.")
 
     def get_s3_upload_token(self):
         logger.debug('Getting STS S3 Upload token')
-        url = f'{get_public_api()}/upload-token/'
+        
+        base_api_url = get_public_api()
+        if base_api_url.endswith('/'):
+            base_api_url = base_api_url.rstrip('/')
+        
+        url = f'{base_api_url}/upload-token'
+        
+        # Determine 'env' dynamically based on the endpoint
+        determined_env = 'prod' # Default to prod
+        if self.endpoint and 'dev' in self.endpoint.lower(): # Check if 'dev' is in the endpoint URL
+            determined_env = 'dev'
+        logger.debug(f"Determined environment: {determined_env} from endpoint: {self.endpoint}") # New debug log
+            
         data = {
             'data': {
-                'attributes': {
-                    'username': self.jb_auth.username,
-                    'token': self.jb_auth.token,
-                    'endpoint': self.endpoint
-                },
-                'type': 'jbtoken'
-            }
+                'username': self.jb_auth.username,
+                'token': self.jb_auth.token,
+                'client': str(self.jb_auth.client_id),
+                'env': determined_env,  # <--- Use the dynamically determined env
+                'endpoint': self.endpoint
+            },
+            'type': 'jbtoken'
         }
-        headers = {'content-type': 'application/json'}
+        
+        headers = {
+            'content-type': 'application/json',
+            'Authorization': f'Token {self.jb_auth.token}' 
+        }
+        
+        logger.debug(f"Sending Authorization Header: {headers['Authorization']}")
+        logger.debug(f"Sending Request Body: {data}")
+        
         response = jb_requests.post(url, data=json.dumps(data),
                                     headers=headers)
+        
         if response.status_code == 401:
             logger.debug(response)
             raise AuthenticationError(str(response.json()['error']))
@@ -47,7 +73,9 @@ class S3Uploader:
             raise ValueError(response.json()['error'])
         elif response.status_code != 200:
             logger.debug(response)
+            logger.error(f"Failed to get S3 upload token. Status: {response.status_code}, Response: {response.text}")
             raise Exception("Couldn't get an S3 upload token.")
+        
         credentials = response.json()
         logger.debug('Successfully retrieved STS S3 Upload token')
         return credentials
@@ -64,8 +92,15 @@ class S3Uploader:
             aws_session_token=s3_creds['session_token'],
         )
         bucket = s3_creds['bucket']
-        clients = credentials['data']['relationships']['clients']
-        client_id = clients['data'][0]['id']
+        clients_included = credentials.get('included')
+        client_id = None
+        if clients_included and len(clients_included) > 0:
+            client_id = clients_included[0].get('id')
+        
+        if not client_id:
+            logger.error("Client ID could not be found in STS upload token response 'included' section.")
+            raise Exception("Client ID not found in STS response.")
+
         failed_files = []
         generated_folder = uuid.uuid4()
         for upload_file in self.files:
@@ -84,7 +119,7 @@ class S3Uploader:
             elif upload_file.startswith('..\\'):
                 filename = upload_file.replace('..\\', '')
             elif upload_file.startswith('.\\'):
-                filename = upload_file.replace('.\\', '')
+                filename = filename.replace('.\\', '')
             elif upload_file.startswith('/'):
                 path, filename = os.path.split(upload_file)
                 parent, local = os.path.split(path)

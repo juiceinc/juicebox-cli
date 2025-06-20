@@ -1,4 +1,4 @@
-NETRC_HOST_NAME = 'api.juiceboxdata.com'
+NETRC_HOST_NAME = 'api-dev.juiceboxdata.com'
 PUBLIC_API_URL = 'https://api-dev.juiceboxdata.com'
 
 # CUSTOM_URL = 'http://127.0.0.1:8000'
