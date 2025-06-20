@@ -9,4 +9,5 @@ processing into an executable.
 """
 
 from juicebox_cli import cli
+
 cli.cli()

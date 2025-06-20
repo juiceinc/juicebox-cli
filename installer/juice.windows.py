@@ -9,5 +9,5 @@ processing into an executable.
 """
 from juicebox_cli import cli
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     cli.cli()
