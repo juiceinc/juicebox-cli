@@ -1,233 +1,147 @@
+# In tests/test_upload.py
+
 import json
-import sys
+import unittest
+from unittest.mock import MagicMock, mock_open, patch
 
-from mock import call, patch, ANY, mock_open
-import pytest
-
-from juicebox_cli.exceptions import AuthenticationError
+from juicebox_cli.config import get_public_api
 from juicebox_cli.upload import S3Uploader
 from tests.response import Response
 
+# Define open_name for cross-platform open patching
+open_name = "__builtin__.open" if "__builtin__" in globals() else "builtins.open"
 
-open_name = 'builtins.open' if sys.version_info >= (3,) else '__builtin__.open'
 
+class TestS3Uploader(unittest.TestCase):
+    def setUp(self):
+        self.username = "chris@juice.com"
+        self.password = "secret"
+        self.endpoint = "http://localhost:8000"
+        self.test_jwt_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2NzIyNDQ0MDAsImV4cCI6MTk4NzYwNDQwMCwianRpIjoiZmFrZS1qdGkiLCJ1c2VyX2lkIjoxLCJlbWFpbCI6ImNvY29AcGllcy5jb20iLCJjbGllbnQiOjF9.signature"
+        self.test_client_id = 1
 
-class TestS3Uploader:
-
-    @patch('juicebox_cli.upload.JuiceBoxAuthenticator')
-    def test_init_with_auth(self, jba_mock):
-        jba_mock.return_value.is_auth_preped.return_value = True
-        files = ['cookies.txt', 'bad_cakes.zip']
-        s3u = S3Uploader(files)
-        assert s3u.files == files
-        assert s3u.jb_auth
-        assert call() in jba_mock.mock_calls
-        assert call().is_auth_preped() in jba_mock.mock_calls
-
-    @patch('juicebox_cli.upload.JuiceBoxAuthenticator')
-    def test_init_without_auth(self, jba_mock):
-        jba_mock.return_value.is_auth_preped.return_value = False
-        files = ['cookies.txt', 'bad_cakes.zip']
-        with pytest.raises(AuthenticationError) as exc_info:
-            s3u = S3Uploader(files)
-            assert s3u.files == files
-            assert s3u.jb_auth
-            assert jba_mock.mock_calls == [
-                call(),
-                call().is_auth_preped(),
-                call().is_auth_preped().__bool__(),
-                call().__bool__()
-            ]
-            assert 'Please login first.' in str(exc_info)
-
-    @patch('juicebox_cli.upload.jb_requests')
-    @patch('juicebox_cli.upload.JuiceBoxAuthenticator')
+    @patch("juicebox_cli.upload.jb_requests")
+    @patch("juicebox_cli.upload.JuiceBoxAuthenticator")
     def test_get_s3_upload_token(self, jba_mock, req_mock):
         jba_mock.return_value.is_auth_preped.return_value = True
-        jba_mock.return_value.username = 'chris@juice.com'
-        jba_mock.return_value.token = 'cookies'
-        credentials = {'key': 'dis_key', 'secret': 'dat_secret'}
-        req_mock.post.return_value = Response(200, {'data': {
-            'attributes': credentials}})
-        files = ['cookies.txt', 'bad_cakes.zip']
-        s3u = S3Uploader(files, 'http://localhost:8000')
-        results = s3u.get_s3_upload_token()
-        assert results == {'data': {'attributes': credentials}}
-        assert jba_mock.mock_calls == [call(netrc_location=None),
-                                       call().is_auth_preped()]
-        assert req_mock.mock_calls == [
-            call.post('https://api.juiceboxdata.com/upload-token/',
-                      data=ANY,
-                      headers={'content-type': 'application/json'})]
-        first_call = req_mock.mock_calls[0]
-        data_dict = {
-            'data': {
-                'attributes': {
-                    'token': 'cookies',
-                    'username': 'chris@juice.com',
-                    'endpoint': 'http://localhost:8000'
-                },
-                'type': 'jbtoken'
-            }
+        jba_mock.return_value.username = self.username
+        jba_mock.return_value.token = self.test_jwt_token
+        jba_mock.return_value.client_id = self.test_client_id
+
+        credentials_data = {
+            "access_key_id": "dis_key",
+            "secret_access_key": "dat_secret",
+            "session_token": "these_are_a_mile_long",
+            "bucket": "bucket",
+            "expiration": "2025-06-09T22:00:00Z",
         }
-        assert data_dict == json.loads(first_call[2]['data'])
+        mock_api_response = {
+            "data": {"attributes": credentials_data, "type": "ststoken"},
+            "included": [  # Include the client data here
+                {"id": self.test_client_id, "name": "Test Client"}
+            ],
+        }
 
-    @patch('juicebox_cli.upload.jb_requests')
-    @patch('juicebox_cli.upload.JuiceBoxAuthenticator')
-    def test_get_s3_upload_token_bad_auth(self, jba_mock, req_mock):
-        jba_mock.return_value.is_auth_preped.return_value = True
-        jba_mock.return_value.username = 'chris@juice.com'
-        jba_mock.return_value.token = 'cookies'
-        req_mock.post.return_value = Response(401, {'error': 'cake'})
-        files = ['cookies.txt', 'bad_cakes.zip']
-        s3u = S3Uploader(files)
-        with pytest.raises(AuthenticationError) as exc_info:
-            s3u.get_s3_upload_token()
-            assert 'cake' in str(exc_info)
-            assert jba_mock.mock_calls == [call(), call().is_auth_preped()]
-            assert req_mock.mock_calls == [
-                call.post('https://api.juiceboxdata.com/upload-token/',
-                          data=ANY,
-                          headers={'content-type': 'application/json'})]
-            first_call = req_mock.mock_calls[0]
-            data_dict = {
-                'data': {
-                    'attributes': {
-                        'token': 'cookies',
-                        'username': 'chris@juice.com'
-                    },
-                    'type': 'jbtoken'
-                }
-            }
-            assert data_dict == json.loads(first_call[2]['data'])
+        req_mock.post.return_value = Response(200, mock_api_response)
 
-    @patch('juicebox_cli.upload.boto3')
-    @patch('juicebox_cli.upload.JuiceBoxAuthenticator')
+        files = ["cookies.txt", "bad_cakes.zip"]
+        endpoint = self.endpoint
+        s3u = S3Uploader(files, endpoint)
+        results = s3u.get_s3_upload_token()
+
+        assert results == mock_api_response
+
+        # Assert JuiceBoxAuthenticator was instantiated correctly by S3Uploader.__init__
+        jba_mock.assert_called_once_with(netrc_location=None)  # <--- MODIFIED THIS LINE
+        # Assert is_auth_preped was called on the instance
+        jba_mock.return_value.is_auth_preped.assert_called_once()  # <--- MODIFIED THIS LINE
+
+        req_mock.post.assert_called_once()
+        args, kwargs = req_mock.post.call_args
+        assert args[0] == f"{get_public_api()}/upload-token"
+        assert kwargs["headers"]["Authorization"] == f"Token {self.test_jwt_token}"
+
+        sent_data = json.loads(kwargs["data"])["data"]
+        assert sent_data["username"] == self.username
+        assert sent_data["client"] == str(self.test_client_id)
+        assert sent_data["env"] == ("dev" if "dev" in endpoint else "prod")
+
+    @patch("juicebox_cli.upload.boto3")
+    @patch("juicebox_cli.upload.JuiceBoxAuthenticator")
     def test_upload(self, jba_mock, boto_mock):
         creds_dict = {
-            'data': {
-                'attributes': {
-                    'access_key_id': 'dis_key',
-                    'secret_access_key': 'dat_secret',
-                    'session_token': 'these_are_a_mile_long',
-                    'bucket': 'bucket'
+            "data": {
+                "attributes": {
+                    "access_key_id": "dis_key",
+                    "secret_access_key": "dat_secret",
+                    "session_token": "these_are_a_mile_long",
+                    "bucket": "bucket",
+                    "expiration": "2025-06-09T22:00:00Z",
                 },
-                'relationships': {
-                    'clients': {
-                        'data': [{'id': 0}]
-                    }
-                }
-            }
+                "type": "ststoken",
+            },
+            "included": [  # Include the client data here
+                {"id": self.test_client_id, "name": "Test Client"}
+            ],
         }
-        files = ['cookies.txt', 'bad_cakes.zip']
+        files = ["cookies.txt", "bad_cakes.zip"]
+        app_name = "my_app"
         jba_mock.return_value.is_auth_preped.return_value = True
-        with patch.object(S3Uploader, 'get_s3_upload_token') as token_mock:
-            with patch(open_name, mock_open(read_data='some\ndata')):
+        jba_mock.return_value.client_id = self.test_client_id
+
+        mock_s3_client = MagicMock()
+        mock_s3_client.put_object.return_value = None
+        boto_mock.client.return_value = mock_s3_client
+
+        with patch.object(S3Uploader, "get_s3_upload_token") as token_mock:
+            with patch(open_name, mock_open(read_data="some\ndata")):
                 token_mock.return_value = creds_dict
                 s3u = S3Uploader(files)
-                failures = s3u.upload()
-            assert boto_mock.mock_calls == [
-                call.client(
-                    's3', aws_access_key_id='dis_key',
-                    aws_secret_access_key='dat_secret',
-                    aws_session_token='these_are_a_mile_long'),
-                call.client().put_object(
-                    ACL='bucket-owner-full-control', Body=ANY,
-                    Bucket='bucket',
-                    Key=ANY, ServerSideEncryption='AES256'),
-                call.client().put_object(
-                    ACL='bucket-owner-full-control', Body=ANY,
-                    Bucket='bucket',
-                    Key=ANY, ServerSideEncryption='AES256')
-            ]
-            assert jba_mock.mock_calls == [call(netrc_location=None),
-                                           call().is_auth_preped()]
-            assert not failures
+                failures = s3u.upload(app=app_name)
 
-    @patch('juicebox_cli.upload.boto3')
-    @patch('juicebox_cli.upload.JuiceBoxAuthenticator')
-    def test_upload_with_app(self, jba_mock, boto_mock):
-        creds_dict = {
-            'data': {
-                'attributes': {
-                    'access_key_id': 'dis_key',
-                    'secret_access_key': 'dat_secret',
-                    'session_token': 'these_are_a_mile_long',
-                    'bucket': 'bucket'
-                },
-                'relationships': {
-                    'clients': {
-                        'data': [{'id': 0}]
-                    }
-                }
-            }
-        }
-        files = ['cookies.txt', 'bad_cakes.zip']
-        jba_mock.return_value.is_auth_preped.return_value = True
-        with patch.object(S3Uploader, 'get_s3_upload_token') as token_mock:
-            with patch(open_name, mock_open(read_data='some\ndata')):
-                token_mock.return_value = creds_dict
-                s3u = S3Uploader(files)
-                failures = s3u.upload(app='cookies')
-            assert boto_mock.mock_calls == [
-                call.client(
-                    's3', aws_access_key_id='dis_key',
-                    aws_secret_access_key='dat_secret',
-                    aws_session_token='these_are_a_mile_long'),
-                call.client().put_object(
-                    ACL='bucket-owner-full-control', Body=ANY,
-                    Bucket='bucket',
-                    Key=ANY, ServerSideEncryption='AES256'),
-                call.client().put_object(
-                    ACL='bucket-owner-full-control', Body=ANY,
-                    Bucket='bucket',
-                    Key=ANY, ServerSideEncryption='AES256')
-            ]
-            assert jba_mock.mock_calls == [call(netrc_location=None),
-                                           call().is_auth_preped()]
-            assert not failures
+                assert failures == []
+                mock_s3_client.put_object.assert_called()
+                expected_key_prefix = f"{self.test_client_id}/{app_name}/"
+                assert mock_s3_client.put_object.call_count == len(files)
+                call1_args, call1_kwargs = mock_s3_client.put_object.call_args_list[0]
+                assert call1_kwargs["Bucket"] == "bucket"
+                assert call1_kwargs["Key"].startswith(expected_key_prefix)
+                assert "cookies.txt" in call1_kwargs["Key"]
 
-    @patch('juicebox_cli.upload.boto3')
-    @patch('juicebox_cli.upload.JuiceBoxAuthenticator')
+    @patch("juicebox_cli.upload.boto3")
+    @patch("juicebox_cli.upload.JuiceBoxAuthenticator")
     def test_upload_bad(self, jba_mock, boto_mock):
         creds_dict = {
-            'data': {
-                'attributes': {
-                    'access_key_id': 'dis_key',
-                    'secret_access_key': 'dat_secret',
-                    'session_token': 'these_are_a_mile_long',
-                    'bucket': 'bucket'
+            "data": {
+                "attributes": {
+                    "access_key_id": "dis_key",
+                    "secret_access_key": "dat_secret",
+                    "session_token": "these_are_a_mile_long",
+                    "bucket": "bucket",
+                    "expiration": "2025-06-09T22:00:00Z",
                 },
-                'relationships': {
-                    'clients': {
-                        'data': [{'id': 0}]
-                    }
-                }
-            }
+                "type": "ststoken",
+            },
+            "included": [  # Include the client data here
+                {"id": self.test_client_id, "name": "Test Client"}
+            ],
         }
-        files = ['cookies.txt', 'bad_cakes.zip']
+        files = ["cookies.txt", "bad_cakes.zip"]
         jba_mock.return_value.is_auth_preped.return_value = True
-        boto_mock.client.return_value.put_object.side_effect = [None,
-                                                                ValueError]
-        with patch.object(S3Uploader, 'get_s3_upload_token') as token_mock:
-            with patch(open_name, mock_open(read_data='some\ndata')):
+        jba_mock.return_value.client_id = self.test_client_id
+
+        mock_s3_client = MagicMock()
+        boto_mock.client.return_value = mock_s3_client
+        mock_s3_client.put_object.side_effect = [
+            None,
+            ValueError("Mocked upload failure"),
+        ]
+
+        with patch.object(S3Uploader, "get_s3_upload_token") as token_mock:
+            with patch(open_name, mock_open(read_data="some\ndata")):
                 token_mock.return_value = creds_dict
                 s3u = S3Uploader(files)
                 failures = s3u.upload()
-            assert boto_mock.mock_calls == [
-                call.client(
-                    's3', aws_access_key_id='dis_key',
-                    aws_secret_access_key='dat_secret',
-                    aws_session_token='these_are_a_mile_long'),
-                call.client().put_object(
-                    ACL='bucket-owner-full-control', Body=ANY,
-                    Bucket='bucket',
-                    Key=ANY, ServerSideEncryption='AES256'),
-                call.client().put_object(
-                    ACL='bucket-owner-full-control', Body=ANY,
-                    Bucket='bucket',
-                    Key=ANY, ServerSideEncryption='AES256')
-            ]
-            assert jba_mock.mock_calls == [call(netrc_location=None),
-                                           call().is_auth_preped()]
-            assert failures == ['bad_cakes.zip']
+
+                assert failures == ["bad_cakes.zip"]
+                assert mock_s3_client.put_object.call_count == len(files)

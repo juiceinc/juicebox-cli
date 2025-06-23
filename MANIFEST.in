@@ -1,1 +1,9 @@
 include LICENSE.txt
+include *.in
+include *.yml
+recursive-include docs *.bat
+recursive-include docs *.py
+recursive-include docs *.rst
+recursive-include installer *.md
+recursive-include installer *.py
+recursive-include tests *.py
